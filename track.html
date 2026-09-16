@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تتبع الطلب | الحد الممتاز</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<style>
+/* نفس المتغيرات */
+:root { --bg: #0b1120; --surface: rgba(30, 41, 59, 0.7); --border: rgba(255, 255, 255, 0.1); --primary: #38bdf8; --text: #f8fafc; --text-muted: #94a3b8; --ok: #10b981; }
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
+body { background: var(--bg); color: var(--text); overflow-x: hidden; }
+canvas#stars { position: fixed; inset: 0; z-index: -1; }
+.wrap { max-width: 700px; margin: 50px auto; padding: 0 20px; }
+header { padding: 15px 20px; background: rgba(11, 17, 32, 0.8); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+header a { color: var(--text); text-decoration: none; font-weight: 700; font-size: 14px; }
+
+.box { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 30px; backdrop-filter: blur(15px); }
+input { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff; padding: 15px; border-radius: 12px; font-size: 16px; outline: none; margin-bottom: 15px; transition:.3s;}
+input:focus { border-color: var(--primary); }
+.btn { width: 100%; background: var(--primary); color: #000; font-weight: 900; padding: 15px; border-radius: 12px; border: none; cursor: pointer; font-size: 18px; transition: .3s; }
+.btn:hover { background: #0284c7; color: #fff; }
+.btn-ok { background: rgba(16, 185, 129, 0.2); color: var(--ok); border: 1px solid var(--ok); }
+.btn-ok:hover { background: var(--ok); color: #000; }
+
+.timeline { margin-top: 30px; border-right: 2px solid var(--border); padding-right: 20px; }
+.t-item { position: relative; padding-bottom: 25px; }
+.t-item::before { content: ''; position: absolute; right: -27px; top: 5px; width: 12px; height: 12px; border-radius: 50%; background: var(--border); border: 2px solid var(--bg); }
+.t-item.done::before { background: var(--primary); box-shadow: 0 0 10px var(--primary); }
+.t-item.done h4 { color: var(--primary); }
+
+.pay-card { border: 1px solid var(--border); border-radius: 12px; padding: 15px; margin-bottom: 10px; cursor: pointer; display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.2); }
+.pay-card.sel { border-color: var(--primary); background: rgba(56, 189, 248, 0.1); }
+input[type=radio] { width: auto; transform: scale(1.2); }
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+<header>
+  <img src="assets/logo-transparent.png" height="40" alt="">
+  <div><a href="index.html">الرئيسية</a><a href="order.html" style="margin-right: 15px; color:var(--primary)">اطلب كشكولك</a></div>
+</header>
+
+<div class="wrap box">
+  <h2 style="text-align: center; margin-bottom: 30px;">🔍 تتبع طلبك</h2>
+  <input id="tId" dir="ltr" placeholder="رقم الطلب (Order ID)">
+  <input id="tPh" dir="ltr" type="tel" placeholder="رقم الموبايل المسجل في الطلب">
+  <button class="btn" onclick="track()">بحث</button>
+  
+  <div id="result" style="margin-top: 30px;"></div>
+</div>
+
+<script>
+// إعدادات النجوم
+const canvas = document.getElementById('stars'); const ctx = canvas.getContext('2d'); canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+let stars = Array.from({length: 80}, () => ({x: Math.random()*canvas.width, y: Math.random()*canvas.height, r: Math.random()*1.5, dx: (Math.random()-0.5)*0.5}));
+function draw() { ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle = '#fff'; stars.forEach(s => { ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); ctx.fill(); s.x += s.dx; if(s.x < 0) s.x = canvas.width; if(s.x > canvas.width) s.x = 0; }); requestAnimationFrame(draw); } draw();
+
+const firebaseConfig = { apiKey: "AIzaSyCSgvi4tyeoQKSw-o8SZ_oFms0zfjgR6kU", authDomain: "alhady.firebaseapp.com", databaseURL: "https://alhady-default-rtdb.firebaseio.com", projectId: "alhady", storageBucket: "alhady.firebasestorage.app", messagingSenderId: "839424225673", appId: "1:839424225673:web:4b68a4ad74e5a2526bf158" };
+firebase.initializeApp(firebaseConfig); const db = firebase.database();
+
+let SETTINGS = { instapay: 'kemo_omar15', wallet: '01101258549', whatsapp: '201101258549' };
+db.ref('settings').once('value', s => { if(s.val()) SETTINGS = {...SETTINGS, ...s.val()}; });
+
+// قراءة الرابط لو جاي من صفحة الطلب
+const urlParams = new URLSearchParams(window.location.search);
+if(urlParams.get('id')) { document.getElementById('tId').value = urlParams.get('id'); document.getElementById('tPh').value = urlParams.get('ph'); track(); }
+
+const STATUS = { pending:'جاري المراجعة', designing:'قيد التصميم 🎨', preview:'التصميم جاهز 👀', approved:'تمت الموافقة ✅', checkout:'في انتظار الشحن 📦', paid:'تم الدفع 💵', delivered:'تم التسليم 🎉' };
+const FLOW = ['pending', 'designing', 'preview', 'approved', 'checkout', 'paid', 'delivered'];
+
+function track() {
+  const id = document.getElementById('tId').value.trim(); const ph = document.getElementById('tPh').value.trim();
+  const res = document.getElementById('result');
+  if(!id || !ph) return res.innerHTML = '<p style="color:#ef4444;text-align:center">اكتب رقم الطلب والموبايل</p>';
+  
+  res.innerHTML = '<p style="text-align:center">⏳ جاري البحث...</p>';
+  
+  db.ref('orders/'+id).once('value', s => {
+    const o = s.val();
+    if(!o || o.phone !== ph) return res.innerHTML = '<p style="color:#ef4444;text-align:center">❌ بيانات غير صحيحة أو الطلب غير موجود</p>';
+    
+    let html = `<h3>الطلب: ${o.subjectLabel} (${o.qty} كشكول)</h3>
+                <p style="color:var(--text-muted); margin-bottom:20px;">الإجمالي: <b style="color:var(--primary)">${o.total} ج.م</b></p>`;
+    
+    // لو التصميم جاهز
+    if(o.status === 'preview' && o.previewImage) {
+      html += `<div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:15px; margin-bottom:20px;">
+        <h4 style="margin-bottom:10px; color:var(--primary)">🎨 تصميمك جاهز!</h4>
+        <img src="${o.previewImage}" style="width:100%; border-radius:10px; margin-bottom:15px;">
+        <button class="btn btn-ok" onclick="approveOrder('${id}')">✅ أوافق على التصميم، يلا نكمل</button>
+      </div>`;
+    }
+
+    // فورم الدفع (تم إصلاح خطأ السعر 0 هنا)
+    if(o.status === 'approved') {
+      html += `<div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:15px; margin-bottom:20px; border:1px solid var(--border);">
+        <h4 style="margin-bottom:15px; color:var(--primary)">📦 بيانات الشحن والدفع (الإجمالي: ${o.total} ج.م)</h4>
+        <input id="coAddr" placeholder="العنوان بالتفصيل (محافظة، مدينة، شارع)">
+        <label class="pay-card sel"><input type="radio" name="pm" value="cash" checked> 💵 الدفع كاش عند الاستلام</label>
+        <label class="pay-card"><input type="radio" name="pm" value="instapay"> 📱 انستا باي (تحويل)</label>
+        <label class="pay-card"><input type="radio" name="pm" value="wallet"> 👛 محفظة إلكترونية (تحويل)</label>
+        <button class="btn" style="margin-top:10px;" onclick="confirmCheckout('${id}', ${o.total})">تأكيد الطلب والشحن ✔</button>
+      </div>`;
+    }
+
+    if(['checkout', 'paid', 'delivered'].includes(o.status)) {
+       html += `<div style="background:rgba(16,185,129,0.1); border:1px solid var(--ok); color:var(--ok); padding:15px; border-radius:15px; margin-bottom:20px;">
+        تم تسجيل بيانات الشحن بنجاح! الإجمالي المطلوب: <b>${o.total} ج.م</b><br>
+        ${o.checkout?.payment !== 'cash' ? `برجاء إرسال إيصال التحويل على واتساب لتسريع الشحن. <a href="https://wa.me/${SETTINGS.whatsapp}" style="color:#fff; text-decoration:underline;">اضغط هنا للمراسلة</a>` : 'سيتم الدفع للمندوب عند الاستلام.'}
+       </div>`;
+    }
+
+    // شريط التتبع
+    html += '<div class="timeline">';
+    FLOW.forEach((st, i) => {
+      let isDone = i <= FLOW.indexOf(o.status);
+      html += `<div class="t-item ${isDone ? 'done' : ''}"><h4>${STATUS[st]}</h4></div>`;
+    });
+    html += '</div>';
+    
+    res.innerHTML = html;
+
+    // تفعيل اختيار الدفع
+    document.querySelectorAll('input[name=pm]').forEach(r => {
+      r.onchange = () => {
+        document.querySelectorAll('.pay-card').forEach(c => c.classList.remove('sel'));
+        r.closest('.pay-card').classList.add('sel');
+      }
+    });
+  });
+}
+
+function approveOrder(id) {
+  db.ref('orders/'+id).update({ status: 'approved' }).then(() => track());
+}
+
+function confirmCheckout(id, totalMoney) {
+  const addr = document.getElementById('coAddr').value.trim();
+  const pm = document.querySelector('input[name=pm]:checked').value;
+  if(!addr) return alert('يرجى كتابة العنوان!');
+  db.ref('orders/'+id).update({
+    status: 'checkout', checkout: { address: addr, payment: pm, at: Date.now() }
+  }).then(() => track());
+}
+</script>
+</body>
+</html>
