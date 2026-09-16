@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الحد الممتاز ستور | ELHAD ELMOMTAZ STORE</title>
+<meta name="description" content="كشاكيل بكالوريا مخصصة باسمك وصورتك — تصميم كريم عمر و مصطفى محمد عبقرينو">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<style>
+:root{
+  --teal:#0c2f30; --teal2:#123f40; --teal3:#0a2425; --yellow:#ffd60a;
+  --yellow2:#ffe14d; --ink:#eaf6f2; --muted:#9dbcb8; --card:#11353680;
+  --danger:#ff5c5c; --ok:#3ddc84; --radius:18px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Cairo',sans-serif;background:var(--teal3);color:var(--ink);overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;z-index:-2;background:
+  radial-gradient(900px 500px at 85% -10%, #1c5b5c55, transparent),
+  radial-gradient(700px 500px at 0% 110%, #ffd60a14, transparent),var(--teal3)}
+.stars{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.5}
+.wrap{max-width:1150px;margin:0 auto;padding:0 18px}
+header{position:sticky;top:0;z-index:50;background:#0a2425cc;backdrop-filter:blur(14px);border-bottom:1px solid #ffffff14}
+.nav{display:flex;align-items:center;gap:18px;padding:12px 0}
+.nav img{height:52px;filter:drop-shadow(0 0 12px #ffd60a55)}
+.nav .links{margin-inline-start:auto;display:flex;gap:6px;flex-wrap:wrap}
+.nav a{color:var(--ink);text-decoration:none;font-weight:700;font-size:14px;padding:8px 14px;border-radius:99px;transition:.25s}
+.nav a:hover,.nav a.active{background:#ffd60a22;color:var(--yellow)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;cursor:pointer;font-family:inherit;font-weight:800;border-radius:14px;padding:13px 26px;font-size:15px;transition:.25s;text-decoration:none}
+.btn-y{background:linear-gradient(135deg,var(--yellow),#ffb700);color:#122a2a;box-shadow:0 8px 24px #ffd60a33}
+.btn-y:hover{transform:translateY(-2px);box-shadow:0 14px 30px #ffd60a55}
+.btn-o{background:#ffffff14;color:var(--ink);border:1px solid #ffffff22}
+.btn-o:hover{background:#ffffff26}
+.btn-d{background:#ff5c5c22;color:var(--danger);border:1px solid #ff5c5c55}
+.btn-ok{background:#3ddc8422;color:var(--ok);border:1px solid #3ddc8455}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.hero{text-align:center;padding:70px 18px 40px;position:relative}
+.hero .badge{display:inline-block;background:#ffd60a1c;color:var(--yellow);border:1px solid #ffd60a44;padding:7px 18px;border-radius:99px;font-weight:700;font-size:13px;margin-bottom:22px}
+.hero img.logo{width:min(340px,72vw);filter:drop-shadow(0 10px 40px #ffd60a33);animation:float 5s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.hero h1{font-size:clamp(26px,5vw,44px);font-weight:900;margin:10px 0 6px}
+.hero h1 span{color:var(--yellow)}
+.hero p{color:var(--muted);max-width:640px;margin:0 auto 26px;font-size:16px;line-height:1.9}
+.hero .cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+section{padding:56px 0}
+.sec-title{text-align:center;margin-bottom:36px}
+.sec-title h2{font-size:clamp(22px,4vw,32px);font-weight:900}
+.sec-title h2 em{font-style:normal;color:var(--yellow)}
+.sec-title p{color:var(--muted);margin-top:6px}
+.grid{display:grid;gap:18px}
+.steps{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.step{background:var(--card);border:1px solid #ffffff12;border-radius:var(--radius);padding:24px;text-align:center;transition:.3s}
+.step:hover{transform:translateY(-5px);border-color:#ffd60a55}
+.step .n{width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,var(--yellow),#ffb700);color:#122a2a;font-size:24px;font-weight:900;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+.step h3{font-size:17px;margin-bottom:8px}
+.step p{color:var(--muted);font-size:13.5px;line-height:1.8}
+.samples{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+.sample{border-radius:var(--radius);overflow:hidden;border:1px solid #ffffff12;position:relative;cursor:zoom-in;background:#000}
+.sample img{width:100%;height:250px;object-fit:cover;display:block;transition:.4s}
+.sample:hover img{transform:scale(1.06)}
+.sample .tag{position:absolute;bottom:10px;right:10px;background:#0a2425cc;backdrop-filter:blur(6px);padding:5px 12px;border-radius:99px;font-size:12px;color:var(--yellow)}
+.panel{background:linear-gradient(160deg,#123c3d,#0b2829);border:1px solid #ffffff14;border-radius:24px;padding:28px;box-shadow:0 24px 60px #00000055}
+.wiz-steps{display:flex;gap:8px;margin-bottom:26px;flex-wrap:wrap}
+.wiz-steps .ws{flex:1;min-width:100px;text-align:center;padding:10px;border-radius:12px;background:#ffffff0a;color:var(--muted);font-weight:700;font-size:13px;transition:.3s;border:1px solid transparent}
+.wiz-steps .ws.on{background:#ffd60a1e;color:var(--yellow);border-color:#ffd60a55}
+.wstep{display:none;animation:fade .35s}
+.wstep.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1}}
+.subj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
+.subj{background:#ffffff08;border:2px solid #ffffff10;border-radius:16px;padding:10px;cursor:pointer;text-align:center;transition:.25s}
+.subj:hover{transform:translateY(-3px)}
+.subj.sel{border-color:var(--yellow);background:#ffd60a14;box-shadow:0 0 0 3px #ffd60a22}
+.subj img{width:100%;height:110px;object-fit:cover;border-radius:10px}
+.subj b{display:block;font-size:13.5px;margin-top:8px}
+.subj small{color:var(--muted);font-size:11px}
+label{display:block;font-weight:700;font-size:14px;margin:16px 0 8px}
+input,select,textarea{width:100%;background:#081f20;border:1px solid #ffffff1c;color:var(--ink);border-radius:12px;padding:13px 15px;font-family:inherit;font-size:15px;transition:.2s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--yellow);box-shadow:0 0 0 3px #ffd60a22}
+input[type=file]{display:none}
+.qty-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.qty-card{background:#ffffff08;border:2px solid #ffffff12;border-radius:16px;padding:14px;text-align:center;cursor:pointer;transition:.25s}
+.qty-card.sel{border-color:var(--yellow);background:#ffd60a14}
+.qty-card b{font-size:20px;color:var(--yellow)}
+.qty-card small{display:block;color:var(--muted)}
+.qty-prev{margin-top:18px;border-radius:16px;overflow:hidden;border:1px solid #ffd60a44;text-align:center}
+.qty-prev img{width:100%;max-width:420px;display:block;margin:0 auto}
+.price-box{display:flex;justify-content:space-between;align-items:center;background:#ffd60a12;border:1px dashed #ffd60a66;border-radius:14px;padding:14px 18px;margin-top:18px;font-weight:800}
+.price-box .p{color:var(--yellow);font-size:24px}
+.offer{background:#3ddc8418;border:1px solid #3ddc8455;color:var(--ok);border-radius:12px;padding:10px 14px;font-size:13.5px;font-weight:700;margin-top:12px}
+.photos{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:8px}
+.ph{aspect-ratio:3/4;border:2px dashed #ffffff2c;border-radius:14px;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;background:#081f20;transition:.2s}
+.ph:hover{border-color:var(--yellow)}
+.ph img{width:100%;height:100%;object-fit:cover}
+.ph .x{position:absolute;top:4px;left:4px;background:#000b;border:none;color:#fff;width:24px;height:24px;border-radius:50%;cursor:pointer;font-weight:900}
+.ph .plus{font-size:26px;color:var(--muted)}
+.wiz-nav{display:flex;justify-content:space-between;margin-top:26px;gap:10px}
+.toast{position:fixed;bottom:22px;right:50%;transform:translateX(50%) translateY(120px);background:#122e2f;border:1px solid var(--yellow);color:var(--ink);padding:14px 26px;border-radius:14px;font-weight:700;z-index:99;transition:.35s;box-shadow:0 12px 40px #000a;max-width:90vw;text-align:center}
+.toast.show{transform:translateX(50%) translateY(0)}
+.timeline{display:flex;flex-direction:column;gap:0;margin:20px 0}
+.tl{display:flex;gap:14px;position:relative;padding-bottom:26px}
+.tl::before{content:"";position:absolute;right:13px;top:28px;bottom:0;width:2px;background:#ffffff1e}
+.tl:last-child::before{display:none}
+.tl .dot{width:28px;height:28px;border-radius:50%;background:#ffffff14;border:2px solid #ffffff2c;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px}
+.tl.done .dot{background:var(--yellow);border-color:var(--yellow);color:#122a2a}
+.tl b{font-size:14.5px}
+.tl small{color:var(--muted);display:block;font-size:12.5px}
+.status-chip{display:inline-block;padding:6px 16px;border-radius:99px;font-weight:800;font-size:13px}
+.pay-opt{display:flex;gap:12px;align-items:flex-start;background:#ffffff08;border:2px solid #ffffff14;border-radius:14px;padding:14px;cursor:pointer;transition:.2s;margin-bottom:10px}
+.pay-opt.sel{border-color:var(--yellow);background:#ffd60a12}
+.pay-opt input{width:auto;margin-top:4px}
+.pay-opt b{color:var(--yellow)}
+.pay-info{background:#081f20;border:1px solid #ffd60a44;border-radius:14px;padding:16px;margin-top:14px;line-height:2}
+.pay-info code{background:#ffd60a22;color:var(--yellow);padding:2px 10px;border-radius:8px;font-size:15px;direction:ltr;unicode-bidi:embed}
+.modal{position:fixed;inset:0;background:#000c;z-index:80;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.modal.open{display:flex}
+.modal .box{background:#0e3233;border:1px solid #ffffff1e;border-radius:20px;max-width:720px;width:100%;max-height:90vh;overflow:auto;padding:20px}
+.modal img{width:100%;border-radius:14px}
+.products{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.prod{background:var(--card);border:1px solid #ffffff12;border-radius:var(--radius);overflow:hidden;transition:.3s}
+.prod:hover{transform:translateY(-5px);border-color:#ffd60a55}
+.prod img{width:100%;height:200px;object-fit:cover}
+.prod .pb{padding:16px}
+.prod .pb b{font-size:16px}
+.prod .pr{color:var(--yellow);font-weight:900;font-size:19px;margin:6px 0}
+.prod .pr small{color:var(--muted);font-weight:400}
+footer{border-top:1px solid #ffffff12;padding:36px 0;text-align:center;color:var(--muted);font-size:14px;line-height:2}
+footer b{color:var(--yellow)}
+.hidden{display:none!important}
+.empty{text-align:center;color:var(--muted);padding:40px 10px}
+.admin-link{position:fixed;bottom:18px;left:18px;z-index:40;background:#0e3233cc;border:1px solid #ffffff22;color:var(--muted);width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:18px;backdrop-filter:blur(8px)}
+@media(max-width:640px){.photos{grid-template-columns:repeat(2,1fr)}.nav img{height:42px}.nav a{padding:6px 10px;font-size:12.5px}}
+</style>
+</head>
+<body>
+<canvas class="stars" id="stars"></canvas>
+
+<header><div class="wrap nav">
+  <img src="assets/logo-transparent.png" alt="الحد الممتاز">
+  <div class="links">
+    <a href="#how">إزاي تطلب</a>
+    <a href="#samples">أعمالنا</a>
+    <a href="#order">اطلب كشكولك</a>
+    <a href="#track">تتبع طلبك</a>
+    <a href="#shop">المنتجات</a>
+  </div>
+</div></header>
+
+<div class="hero">
+  <div class="badge">✦ كشاكيل بكالوريا 2027 مخصصة باسمك وصورتك ✦</div>
+  <img class="logo" src="assets/logo-transparent.png" alt="الحد الممتاز ستور">
+  <h1>الحد <span>الممتاز</span> ستور</h1>
+  <p>كشكولك يتصمم على ذوقك — صورتك، اسمك، ومادتك. اختار المادة، ابعت صورك، واستلم تصميمك قبل ما تدفع جنيه واحد. مواد أساسية: عربي • إنجليزي • تاريخ + مادة اختيارية من 7 اختيارات.</p>
+  <div class="cta">
+    <a class="btn btn-y" href="#order">🛒 اطلب كشكولك دلوقتي</a>
+    <a class="btn btn-o" href="#how">إزاي بنشتغل؟</a>
+  </div>
+</div>
+
+<section id="how"><div class="wrap">
+  <div class="sec-title"><h2>إزاي <em>تطلب</em> كشكولك؟</h2><p>4 خطوات بس وكشكولك يوصلك</p></div>
+  <div class="grid steps">
+    <div class="step"><div class="n">1</div><h3>اختار مادتك والكمية</h3><p>3 مواد أساسية + مادة اختيارية. الكشكول بـ <span class="pr-s">100</span> جنيه، ولو طلبت 4 بـ <span class="pr-b">350</span> بدل 400.</p></div>
+    <div class="step"><div class="n">2</div><h3>ابعت اسمك وصورك</h3><p>اكتب اسمك بالعربي والإنجليزي وابعت من 3 لـ 4 صور ليك عشان نصمم عليها.</p></div>
+    <div class="step"><div class="n">3</div><h3>شوف التصميم ووافق</h3><p>بنعمل التصميم ونبعتهولك، لو عجبك توافق وتكمّل، لو مش عاجبك تطلب تعديل مجاناً.</p></div>
+    <div class="step"><div class="n">4</div><h3>ادفع واستلم</h3><p>كاش عند الاستلام، أو انستا باي / محفظة، وابعت الإيصال على واتساب.</p></div>
+  </div>
+</div></section>
+
+<section id="samples"><div class="wrap">
+  <div class="sec-title"><h2>من <em>أعمالنا</em> السابقة</h2><p>دول كشاكيل اتصممت لطلبة زيك</p></div>
+  <div class="grid samples" id="samplesGrid"></div>
+</div></section>
+
+<section id="order"><div class="wrap">
+  <div class="sec-title"><h2>اطلب <em>كشكولك</em></h2><p>هنصمملك عينة قبل أي دفع</p></div>
+  <div class="panel">
+    <div class="wiz-steps">
+      <div class="ws on" data-ws="1">① المادة</div>
+      <div class="ws" data-ws="2">② الكمية</div>
+      <div class="ws" data-ws="3">③ بياناتك</div>
+      <div class="ws" data-ws="4">④ الصور</div>
+      <div class="ws" data-ws="5">⑤ تأكيد</div>
+    </div>
+
+    <div class="wstep on" data-step="1">
+      <label>اختار المادة</label>
+      <div class="subj-grid" id="subjGrid"></div>
+      <div id="lang2box" class="hidden">
+        <label>اختار اللغة الثانية</label>
+        <select id="lang2sel">
+          <option>فرنساوي</option><option>إيطالي</option><option>صيني</option>
+          <option>ألماني</option><option>إسباني</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="wstep" data-step="2">
+      <label>اختار عدد الكشاكيل</label>
+      <div class="qty-row" id="qtyRow">
+        <div class="qty-card sel" data-qty="1"><b>1</b><small>كشكول</small><div class="pr-s" style="color:var(--yellow);font-weight:900">100 ج.م</div></div>
+        <div class="qty-card" data-qty="2"><b>2</b><small>كشكول</small><div class="pr-s" style="color:var(--yellow);font-weight:900">200 ج.م</div></div>
+        <div class="qty-card" data-qty="4"><b>4</b><small>كشكول</small><div style="color:var(--ok);font-weight:900">350 ج.م</div></div>
+      </div>
+      <div class="offer">🎁 عرض الباقة: 4 كشاكيل بـ 350 بدل 400 — وفّر 50 جنيه!</div>
+      <div class="qty-prev"><img id="qtyPrev" src="assets/ui/qty-1.jpg" alt="معاينة الكمية"></div>
+    </div>
+
+    <div class="wstep" data-step="3">
+      <label>اسمك بالعربي *</label><input id="nameAr" placeholder="مثال: كريم عمر">
+      <label>اسمك بالإنجليزي *</label><input id="nameEn" dir="ltr" placeholder="Kareem Omar">
+      <label>رقم الموبايل (واتساب) *</label><input id="phone" dir="ltr" inputmode="tel" placeholder="01xxxxxxxxx">
+      <label>ملاحظات للتصميم (اختياري)</label><textarea id="notes" rows="2" placeholder="ألوان بتحبها، اقتباس، أي تفاصيل..."></textarea>
+    </div>
+
+    <div class="wstep" data-step="4">
+      <label>ابعت من 3 لـ 4 صور ليك *</label>
+      <div class="photos" id="photos"></div>
+      <p style="color:var(--muted);font-size:13px;margin-top:10px">📷 صور واضحة ومنورة هتطلع التصميم أحلى. الصور هتتحفظ عندنا بس عشان التصميم.</p>
+    </div>
+
+    <div class="wstep" data-step="5">
+      <label>راجع طلبك</label>
+      <div id="review" style="background:#081f20;border-radius:14px;padding:18px;line-height:2.1"></div>
+    </div>
+
+    <div class="wiz-nav">
+      <button class="btn btn-o" id="prevBtn">→ السابق</button>
+      <button class="btn btn-y" id="nextBtn">التالي ←</button>
+    </div>
+  </div>
+</div></section>
+
+<section id="track"><div class="wrap">
+  <div class="sec-title"><h2>تتبع <em>طلبك</em></h2><p>اكتب رقم الطلب ورقم موبايلك عشان تشوف حالته وتصميمك</p></div>
+  <div class="panel" style="max-width:640px;margin:0 auto">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <input id="trackId" dir="ltr" placeholder="رقم الطلب">
+      <input id="trackPhone" dir="ltr" placeholder="الموبايل">
+    </div>
+    <button class="btn btn-y" style="width:100%;margin-top:14px" id="trackBtn">🔍 دور على طلبي</button>
+    <div id="trackResult" style="margin-top:22px"></div>
+  </div>
+</div></section>
+
+<section id="shop"><div class="wrap">
+  <div class="sec-title"><h2>منتجات <em>المتجر</em></h2><p>حاجات تانية بنوفّرها للطلبة</p></div>
+  <div class="grid products" id="prodGrid"></div>
+</div></section>
+
+<footer>
+  <img src="assets/logo-transparent.png" style="height:70px;margin-bottom:10px" alt="">
+  <div>تصميم وتطوير <b>كريم عمر</b> & <b>مصطفى محمد (عبقرينو)</b> — فريق AKMTOA</div>
+  <div>الحد الممتاز ستور © 2026 — كشاكيل بكالوريا 2027 بتصميم يفرّقك ✦</div>
+</footer>
+
+<a class="admin-link" href="admin.html" title="لوحة التحكم">⚙️</a>
+
+<div class="modal" id="modal"><div class="box"><button class="btn btn-o" style="float:left" onclick="modal.classList.remove('open')">✕</button><img id="modalImg" src=""></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCSgvi4tyeoQKSw-o8SZ_oFms0zfjgR6kU",
+  authDomain: "alhady.firebaseapp.com",
+  databaseURL: "https://alhady-default-rtdb.firebaseio.com",
+  projectId: "alhady",
+  storageBucket: "alhady.firebasestorage.app",
+  messagingSenderId: "839424225673",
+  appId: "1:839424225673:web:4b68a4ad74e5a2526bf158",
+  measurementId: "G-5GE3K43796"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+const DEF_SUBJECTS = [
+  {key:'arabic',label:'اللغة العربية',labelEn:'ARABIC',img:'assets/covers/arabic.jpg',main:true},
+  {key:'english',label:'اللغة الإنجليزية',labelEn:'ENGLISH',img:'assets/covers/english.jpg',main:true},
+  {key:'history',label:'التاريخ',labelEn:'HISTORY',img:'assets/covers/history.jpg',main:true},
+  {key:'physics',label:'الفيزياء',labelEn:'PHYSICS',img:'assets/covers/physics.jpg',main:false},
+  {key:'chemistry',label:'الكيمياء',labelEn:'CHEMISTRY',img:'assets/covers/chemistry.jpg',main:false},
+  {key:'programming',label:'البرمجة',labelEn:'PROGRAMMING',img:'assets/covers/programming.jpg',main:false},
+  {key:'business',label:'إدارة الأعمال',labelEn:'BUSINESS',img:'assets/covers/business.jpg',main:false},
+  {key:'accounting',label:'المحاسبة',labelEn:'ACCOUNTING',img:'assets/covers/accounting.jpg',main:false},
+  {key:'psychology',label:'علم النفس',labelEn:'PSYCHOLOGY',img:'assets/covers/psychology.jpg',main:false},
+  {key:'lang2',label:'اللغة الثانية',labelEn:'2nd LANGUAGE',img:'assets/covers/lang2.jpg',main:false},
+];
+let SUBJECTS = [...DEF_SUBJECTS];
+let SETTINGS = {priceSingle:100,bundleQty:4,bundlePrice:350,instapay:'kemo_omar15',wallet:'01101258549',whatsapp:'201101258549'};
+
+const $ = s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+const toast = m=>{const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._x);t._x=setTimeout(()=>t.classList.remove('show'),3200)};
+const money = n=>n+' ج.م';
+const modal = $('#modal');
+
+/* stars bg */
+(()=>{const c=$('#stars'),x=c.getContext('2d');let W,H;const rs=()=>{W=c.width=innerWidth;H=c.height=innerHeight};rs();addEventListener('resize',rs);
+const S=Array.from({length:70},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*1.6+.3,s:Math.random()*.3+.05}));
+(function loop(){x.clearRect(0,0,W,H);S.forEach(p=>{p.y-=p.s;if(p.y<0)p.y=H;x.globalAlpha=.4+Math.sin(Date.now()/800+p.x)*.3;x.fillStyle='#ffd60a';x.beginPath();x.arc(p.x,p.y,p.r,0,7);x.fill()});requestAnimationFrame(loop)})()})();
+
+/* samples */
+$('#samplesGrid').innerHTML = Array.from({length:8},(_,i)=>
+ `<div class="sample" onclick="showModal('assets/samples/sample-${i+1}.jpg')"><img loading="lazy" src="assets/samples/sample-${i+1}.jpg" alt="كشاكيل سابقة"><span class="tag">تصميم #${i+1}</span></div>`).join('');
+function showModal(src){$('#modalImg').src=src;modal.classList.add('open')}
+modal.onclick=e=>{if(e.target===modal)modal.classList.remove('open')};
+
+/* load settings & subjects from firebase */
+db.ref('settings').on('value',s=>{const v=s.val();if(v){SETTINGS={...SETTINGS,...v};
+  $$('.pr-s').forEach(e=>e.textContent=SETTINGS.priceSingle);
+  $$('.pr-b').forEach(e=>e.textContent=SETTINGS.bundlePrice);
+  const q4=$('.qty-card[data-qty="4"] div:last-child'); if(q4)q4.textContent=SETTINGS.bundlePrice+' ج.م';
+}});
+db.ref('covers').on('value',s=>{const v=s.val();if(v){SUBJECTS=Object.values(v).filter(x=>x.active!==false);renderSubjects()}});
+function renderSubjects(){
+  $('#subjGrid').innerHTML = SUBJECTS.map((s,i)=>`<div class="subj" data-i="${i}" data-key="${s.key}"><img src="${s.img}" loading="lazy" alt="${s.label}"><b>${s.label}</b><small>${s.main?'مادة أساسية':'اختيارية'}</small></div>`).join('');
+  $$('.subj').forEach(el=>el.onclick=()=>{$$('.subj').forEach(x=>x.classList.remove('sel'));el.classList.add('sel');
+    $('#lang2box').classList.toggle('hidden',el.dataset.key!=='lang2');renderReview()});
+}
+renderSubjects();
+
+/* wizard */
+let step=1, order={subject:null,qty:1,photos:[]};
+function goto(n){
+  step=Math.min(5,Math.max(1,n));
+  $$('.wstep').forEach(e=>e.classList.toggle('on',+e.dataset.step===step));
+  $$('.ws').forEach(e=>e.classList.toggle('on',+e.dataset.ws<=step));
+  $('#prevBtn').style.visibility=step===1?'hidden':'visible';
+  $('#nextBtn').textContent=step===5?'✅ تأكيد الطلب':'التالي ←';
+  if(step===5)renderReview();
+}
+$('#prevBtn').onclick=()=>goto(step-1);
+$('#nextBtn').onclick=()=>{ if(!validateStep())return; if(step<5)goto(step+1); else submitOrder(); };
+
+function validateStep(){
+  if(step===1&&!order.subject)return toast('⚠️ اختار المادة الأول'),false;
+  if(step===3){
+    if(!$('#nameAr').value.trim())return toast('⚠️ اكتب اسمك بالعربي'),false;
+    if(!$('#nameEn').value.trim())return toast('⚠️ اكتب اسمك بالإنجليزي'),false;
+    const ph=$('#phone').value.replace(/\s/g,'');
+    if(!/^01\d{9}$/.test(ph))return toast('⚠️ رقم الموبايل لازم يكون 11 رقم ويبدأ بـ 01'),false;
+  }
+  if(step===4&&order.photos.length<3)return toast('⚠️ ابعت على الأقل 3 صور'),false;
+  return true;
+}
+function price(){const p=SETTINGS.priceSingle;return order.qty>=SETTINGS.bundleQty?SETTINGS.bundlePrice:order.qty*p}
+function renderReview(){
+  const s=SUBJECTS.find(x=>x.key===order.subject);
+  const extra=order.subject==='lang2'?(' — '+$('#lang2sel').value):'';
+  $('#review').innerHTML=`
+   📚 المادة: <b style="color:var(--yellow)">${s?s.label+extra:'—'}</b><br>
+   🔢 الكمية: <b>${order.qty} كشكول</b><br>
+   👤 الاسم: <b>${$('#nameAr').value||'—'}</b> / <b dir="ltr">${$('#nameEn').value||'—'}</b><br>
+   📱 الموبايل: <b dir="ltr">${$('#phone').value||'—'}</b><br>
+   🖼️ الصور: <b>${order.photos.length} صور</b><br>
+   💰 الإجمالي: <b style="color:var(--yellow);font-size:19px">${money(price())}</b>
+   ${$('#notes').value?'<br>📝 ملاحظات: '+$('#notes').value:''}`;
+}
+$('#qtyRow').addEventListener('click',e=>{
+  const c=e.target.closest('.qty-card');if(!c)return;
+  $$('.qty-card').forEach(x=>x.classList.remove('sel'));c.classList.add('sel');
+  order.qty=+c.dataset.qty;
+  $('#qtyPrev').src=`assets/ui/qty-${order.qty}.jpg`;
+});
+['nameAr','nameEn','phone','notes','lang2sel'].forEach(id=>$('#'+id).addEventListener('input',renderReview));
+
+/* photo slots */
+const photosEl=$('#photos');
+function renderPhotos(){
+  photosEl.innerHTML='';
+  order.photos.forEach((p,i)=>{
+    const d=document.createElement('div');d.className='ph';
+    d.innerHTML=`<img src="${p}"><button class="x" type="button">✕</button>`;
+    d.querySelector('.x').onclick=e=>{e.stopPropagation();order.photos.splice(i,1);renderPhotos()};
+    d.onclick=()=>showModal(p);photosEl.appendChild(d);
+  });
+  if(order.photos.length<4){
+    const d=document.createElement('label');d.className='ph';
+    d.innerHTML='<span class="plus">＋</span><input type="file" accept="image/*">';
+    d.querySelector('input').onchange=e=>compress(e.target.files[0],b=>{order.photos.push(b);renderPhotos()});
+    photosEl.appendChild(d);
+  }
+}
+renderPhotos();
+function compress(file,cb,maxDim=800,q=.7){
+  const r=new FileReader();r.onload=e=>{const img=new Image();img.onload=()=>{
+    let w=img.width,h=img.height;const s=Math.min(1,maxDim/Math.max(w,h));
+    const c=document.createElement('canvas');c.width=w*s;c.height=h*s;
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',q));
+  };img.src=e.target.result};r.readAsDataURL(file);
+}
+
+/* submit order */
+let submitting=false;
+function submitOrder(){
+  if(submitting)return;submitting=true;
+  const btn=$('#nextBtn');btn.disabled=true;btn.textContent='⏳ بيتبعت...';
+  const s=SUBJECTS.find(x=>x.key===order.subject);
+  const data={
+    nameAr:$('#nameAr').value.trim(),nameEn:$('#nameEn').value.trim(),
+    phone:$('#phone').value.trim(),subject:order.subject,
+    subjectLabel:s.label+(order.subject==='lang2'?' — '+$('#lang2sel').value:''),
+    qty:order.qty,total:price(),notes:$('#notes').value.trim(),
+    photos:order.photos,status:'pending',createdAt:Date.now(),history:{pending:Date.now()}
+  };
+  db.ref('orders').push(data).then(ref=>{
+    submitting=false;btn.disabled=false;
+    const oid=ref.key;
+    $$('.wstep').forEach(e=>e.classList.remove('on'));
+    $('.wiz-steps').style.display='none';$('.wiz-nav').style.display='none';
+    const p=document.createElement('div');p.className='wstep on';p.dataset.step='9';
+    p.innerHTML=`<div style="text-align:center;padding:30px 10px">
+      <div style="font-size:56px">🎉</div>
+      <h3 style="font-size:22px;margin:10px 0">تم استلام طلبك بنجاح!</h3>
+      <p style="color:var(--muted)">احفظ رقم طلبك عشان تتبع التصميم:</p>
+      <div style="font-size:26px;font-weight:900;color:var(--yellow);letter-spacing:2px;margin:14px 0;direction:ltr">${oid}</div>
+      <button class="btn btn-y" onclick="prefillTrack('${oid}')">تتبع طلبي 🔍</button>
+      <p style="color:var(--muted);font-size:13px;margin-top:16px">هنصمم ونبعتلك العينة في أقرب وقت — هنكلمك على واتساب.</p></div>`;
+    p.querySelector('.btn').onclick=()=>{prefillTrack(oid)};
+    $('.panel').appendChild(p);
+    toast('✅ تم استلام طلبك!');
+  }).catch(err=>{submitting=false;btn.disabled=false;btn.textContent='✅ تأكيد الطلب';toast('❌ حصل خطأ — حاول تاني')});
+}
+function prefillTrack(oid){$('#trackId').value=oid;document.getElementById('track').scrollIntoView({behavior:'smooth'});doTrack()}
+
+/* track order */
+$('#trackBtn').onclick=doTrack;
+const STATUS_MAP={
+  pending:['تم استلام طلبك','🟡','#ffd60a'],designing:['قيد التصميم','🎨','#4db8ff'],
+  preview:['التصميم جاهز — لسه ما وافقتش','👀','#b78bff'],changes:['في تعديلات مطلوبة','🔁','#ff9d4d'],
+  approved:['وافقت على التصميم ✅','✅','#3ddc84'],checkout:['بيانات الشحن اتسجلت','📦','#3ddc84'],
+  paid:['تم الدفع','💵','#3ddc84'],delivered:['تم التسليم 🎉','🏁','#3ddc84'],cancelled:['الطلب اتلغى','❌','#ff5c5c']};
+const FLOW=['pending','designing','preview','approved','checkout','paid','delivered'];
+
+$('#trackResult').addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');if(!b)return;
+  const {act,oid}=b.dataset;
+  if(act==='approve'){db.ref('orders/'+oid).update({status:'approved',approvedAt:Date.now(),'history/approved':Date.now()}).then(()=>toast('✅ تمت الموافقة — كمّل بيانات الشحن'))}
+  if(act==='changes'){const n=prompt('اكتب التعديلات اللي عايزها:');if(n)db.ref('orders/'+oid).update({status:'changes',changeNote:n,'history/changes':Date.now()}).then(()=>toast('✅ اتبعتت ملاحظاتك'))}
+});
+function doTrack(){
+  const oid=$('#trackId').value.trim(),ph=$('#trackPhone').value.trim();
+  if(!oid||!ph)return toast('⚠️ اكتب رقم الطلب والموبايل');
+  $('#trackResult').innerHTML='<div class="empty">⏳ بندور...</div>';
+  db.ref('orders/'+oid).once('value',s=>{
+    const o=s.val();const R=$('#trackResult');
+    if(!o)return R.innerHTML='<div class="empty">❌ مفيش طلب بالرقم ده</div>';
+    if(o.phone.replace(/\D/g,'')!==ph.replace(/\D/g,''))return R.innerHTML='<div class="empty">❌ رقم الموبايل مش مطابق للطلب</div>';
+    const [txt]=[STATUS_MAP[o.status]||['','']];
+    let h=`<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px">
+      <b>طلب #${oid.slice(-6)} — ${o.subjectLabel} × ${o.qty}</b>
+      <span class="status-chip" style="background:${txt[2]}22;color:${txt[2]}">${txt[1]} ${txt[0]}</span></div>`;
+    if(o.status==='preview'&&o.previewImage){
+      h+=`<div style="margin:14px 0"><label>🎨 التصميم بتاعك:</label><img src="${o.previewImage}" style="width:100%;border-radius:14px;border:1px solid #ffd60a55;cursor:zoom-in" onclick="showModal('${o.previewImage}')">
+      <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+        <button class="btn btn-ok" data-act="approve" data-oid="${oid}">✅ عجبني، أوافق</button>
+        <button class="btn btn-d" data-act="changes" data-oid="${oid}">🔁 عايز تعديل</button></div></div>`;
+    }
+    if(o.changeNote&&o.status!=='preview')h+=`<div class="pay-info">🔁 آخر تعديلاتك: ${o.changeNote}</div>`;
+    if(o.status==='approved')h+=checkoutForm(oid,o);
+    if(['checkout','paid','delivered'].includes(o.status)){
+      const pm={cash:'💵 كاش عند الاستلام',instapay:'📱 انستا باي',wallet:'👛 محفظة إلكترونية'}[o.checkout?.payment];
+      h+=`<div class="pay-info">📦 العنوان: ${o.checkout.address} — ${o.checkout.city}<br>💳 الدفع: ${pm||'—'}</div>`;
+    }
+    h+='<label style="margin-top:18px">حالة الطلب:</label><div class="timeline">'+FLOW.map((st,i)=>{
+      const done=i<=FLOW.indexOf(o.status)&&o.status!=='cancelled';
+      const t=STATUS_MAP[st];
+      return `<div class="tl ${done?'done':''}"><div class="dot">${done?'✓':''}</div><div><b>${t[1]} ${t[0].split('—')[0]}</b><small>${o.history&&o.history[st]?new Date(o.history[st]).toLocaleString('ar-EG'):''}</small></div></div>`;
+    }).join('')+'</div>';
+    R.innerHTML=h;
+    if(o.status==='approved')bindCheckout(oid);
+  });
+}
+function checkoutForm(oid,o){
+  return `<div style="margin-top:16px"><label>📦 بيانات الشحن والدفع:</label>
+  <input id="co-addr" placeholder="العنوان بالتفصيل (محافظة — مدينة — شارع — رقم العمارة)">
+  <input id="co-city" placeholder="المحافظة" style="margin-top:10px">
+  <label style="margin-top:14px">طريقة الدفع:</label>
+  <label class="pay-opt"><input type="radio" name="pm" value="cash" checked><span>💵 <b>كاش عند الاستلام</b><br><small style="color:var(--muted)">تدفع لما يوصلك الطلب</small></span></label>
+  <label class="pay-opt"><input type="radio" name="pm" value="instapay"><span>📱 <b>انستا باي</b><br><small style="color:var(--muted)">حوّل على <code style="direction:ltr;unicode-bidi:embed">${SETTINGS.instapay}</code> وابعت الإيصال</small></span></label>
+  <label class="pay-opt"><input type="radio" name="pm" value="wallet"><span>👛 <b>محفظة إلكترونية</b><br><small style="color:var(--muted)">حوّل على <code style="direction:ltr;unicode-bidi:embed">${SETTINGS.wallet}</code> (فودافون كاش / اتصالات كاش) وابعت الإيصال</small></span></label>
+  <button class="btn btn-y" style="width:100%;margin-top:10px" id="co-btn">تأكيد الطلب ✔</button></div>`;
+}
+function bindCheckout(oid){
+  $$('input[name=pm]').forEach(r=>r.onchange=()=>{$$('.pay-opt').forEach(p=>p.classList.remove('sel'));r.closest('.pay-opt').classList.add('sel')});
+  $('#co-btn').onclick=()=>{
+    const addr=$('#co-addr').value.trim(),city=$('#co-city').value.trim();
+    if(!addr||!city)return toast('⚠️ اكتب العنوان والمحافظة');
+    const pm=document.querySelector('input[name=pm]:checked').value;
+    db.ref('orders/'+oid).update({status:'checkout',checkout:{address:addr,city,payment:pm,at:Date.now()},'history/checkout':Date.now()}).then(()=>{
+      let h=`<div class="pay-info">🎉 <b>تم تأكيد طلبك!</b><br>`;
+      if(pm==='cash')h+=`💵 ادفع ${money(0)} — استلم وادفع كاش. هنتواصل معاك لتحديد التوصيل.`;
+      else{
+        const target=pm==='instapay'?SETTINGS.instapay:SETTINGS.wallet;
+        h+=`💰 حوّل <code>${target}</code> بمبلغ اللي ظهر في طلبك، وابعت <b>إسكرين الشاشة</b> على واتساب <a href="https://wa.me/${SETTINGS.whatsapp}" style="color:var(--yellow);font-weight:800">${SETTINGS.wallet}</a> — وبعدها هنأكد الطلب ونشحن.`;
+      }
+      h+='</div>';
+      $('#trackResult').insertAdjacentHTML('afterbegin',h);
+      toast('✅ تم تأكيد الطلب');doTrack();
+    });
+  };
+}
+
+/* products */
+db.ref('products').on('value',s=>{
+  const v=s.val();const g=$('#prodGrid');const items=v?Object.entries(v).filter(([,p])=>p.active!==false):[];
+  if(!items.length){g.innerHTML='<div class="empty" style="grid-column:1/-1">🛍️ منتجات جديدة قريباً — تابعنا!</div>';return}
+  g.innerHTML=items.map(([id,p])=>`<div class="prod"><img src="${p.image}" loading="lazy" alt="${p.name}">
+   <div class="pb"><b>${p.name}</b><div class="pr">${money(p.price)}</div>
+   <p style="color:var(--muted);font-size:13px;min-height:36px">${p.desc||''}</p>
+   <a class="btn btn-y" style="width:100%;padding:10px" href="https://wa.me/${SETTINGS.whatsapp}?text=${encodeURIComponent('عايز أطلب: '+p.name)}" target="_blank">🛒 اطلب واتساب</a></div></div>`).join('');
+});
+</script>
+</body>
+</html>
