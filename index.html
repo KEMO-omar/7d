@@ -3,137 +3,287 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>الحد الممتاز ستور | الرئيسية</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<style>
-:root {
-  --bg: #0b1120;
-  --surface: rgba(30, 41, 59, 0.6);
-  --border: rgba(255, 255, 255, 0.1);
-  --primary: #38bdf8;
-  --primary-hover: #0284c7;
-  --text: #f8fafc;
-  --text-muted: #94a3b8;
-  --accent: #f59e0b;
-}
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
-body { background: var(--bg); color: var(--text); overflow-x: hidden; }
-canvas#stars { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
-
-.wrap { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
-header { background: rgba(11, 17, 32, 0.8); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; padding: 15px 0; }
-.nav { display: flex; align-items: center; justify-content: space-between; }
-.nav img { height: 45px; }
-.links a { color: var(--text); text-decoration: none; margin-right: 20px; font-weight: 700; transition: .3s; }
-.links a:hover { color: var(--primary); }
-
-.hero { text-align: center; padding: 100px 20px; }
-.hero h1 { font-size: clamp(30px, 6vw, 55px); font-weight: 900; margin-bottom: 15px; text-shadow: 0 0 20px rgba(56, 189, 248, 0.3); }
-.hero h1 span { color: var(--primary); }
-.hero p { color: var(--text-muted); font-size: 18px; max-width: 600px; margin: 0 auto 30px; }
-
-.btn { display: inline-block; background: var(--primary); color: #0b1120; font-weight: 900; padding: 15px 35px; border-radius: 12px; text-decoration: none; font-size: 18px; transition: .3s; border: none; cursor: pointer; box-shadow: 0 0 15px rgba(56, 189, 248, 0.4); }
-.btn:hover { background: var(--primary-hover); transform: translateY(-3px); box-shadow: 0 0 25px rgba(56, 189, 248, 0.6); }
-.btn-o { background: transparent; color: var(--primary); border: 2px solid var(--primary); box-shadow: none; }
-.btn-o:hover { background: rgba(56, 189, 248, 0.1); box-shadow: none; }
-
-section { padding: 80px 0; border-top: 1px solid var(--border); }
-.sec-title { text-align: center; margin-bottom: 50px; }
-.sec-title h2 { font-size: 35px; color: var(--text); }
-.sec-title h2 span { color: var(--primary); }
-
-.grid { display: grid; gap: 20px; }
-.g-3 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
-.g-4 { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
-
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 30px; text-align: center; backdrop-filter: blur(10px); transition: .3s; }
-.card:hover { transform: translateY(-5px); border-color: var(--primary); }
-.card .n { width: 60px; height: 60px; background: rgba(56,189,248,0.1); color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 900; margin: 0 auto 20px; border: 1px solid rgba(56,189,248,0.3); }
-
-.sample { border-radius: 15px; overflow: hidden; border: 1px solid var(--border); cursor: zoom-in; }
-.sample img { width: 100%; height: 250px; object-fit: cover; transition: .5s; display: block; }
-.sample:hover img { transform: scale(1.1); }
-
-footer { text-align: center; padding: 30px; border-top: 1px solid var(--border); color: var(--text-muted); margin-top: 50px; }
-.modal { position: fixed; inset: 0; background: rgba(11, 17, 32, 0.9); z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
-.modal.open { display: flex; }
-.modal img { max-width: 100%; max-height: 90vh; border-radius: 15px; border: 1px solid var(--border); }
-</style>
+<title>الحد الممتاز — من طالب لطالب | منصة 2027</title>
+<meta name="description" content="سلسلة كتب الحد الممتاز: شرح بالعامية، تصميم مودرن، أسئلة مضمونة من الوزارة — الفيزياء والعربي والإنجليزي والتاريخ للبكالوريا 2027.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-<canvas id="stars"></canvas>
+<div class="doodle-bg"></div>
 
+<!-- ================= الهيدر ================= -->
 <header>
   <div class="wrap nav">
-    <img src="assets/logo-transparent.png" alt="الحد الممتاز">
-    <div class="links">
-      <a href="index.html">الرئيسية</a>
-      <a href="order.html" style="color:var(--accent)">🛒 اطلب كشكولك</a>
-      <a href="track.html">تتبع طلبك</a>
-    </div>
+    <a class="logo" href="index.html">
+      <span class="logo-badge">الحد الممتاز</span>
+      <span class="logo-sub">منصة 2027</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#story">حكايتنا</a>
+      <a href="#secret">سر التصميم</a>
+      <a href="#preview">معاينة مجانية</a>
+      <a href="#why">ليه نحن؟</a>
+    </nav>
+    <a class="btn small" href="order.html" style="margin-inline-start:auto">اطلب نسختك الآن</a>
   </div>
 </header>
 
-<div class="wrap hero">
-  <img src="assets/logo-transparent.png" alt="Logo" style="width: 250px; margin-bottom: 20px; filter: drop-shadow(0 0 20px rgba(255,255,255,0.1));">
-  <h1>الحد <span>الممتاز</span> ستور</h1>
-  <p>كشكول بكالوريا 2027 مخصص باسمك وصورتك، هنصممهولك ونبعتلك العينة تشوفها قبل ما تدفع جنيه واحد!</p>
-  <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-    <a href="order.html" class="btn">🛒 اطلب كشكولك دلوقتي</a>
-    <a href="#samples" class="btn btn-o">شوف أعمالنا</a>
+<!-- ================= الهيرو ================= -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="tag">البكالوريا 2027 • من طالب لطالب</span>
+      <h1>زهقت من الدش واللغة الفصحى المعقدة؟<br>أهلاً بك في عصر <span class="hl">المذاكرة الممتعة</span></h1>
+      <p class="lead">
+        "الحد الممتاز" مش كتاب خارجي — ده كشكول زميلك الشاطر: شرح بالعامية، تصميم يفتح النفس،
+        أسئلة من كتاب المدرسة وتقييمات الوزارة بس، وكبسولات تريند تخلي القانون يثبت في دماغك.
+      </p>
+      <div class="hero-cta">
+        <a class="btn" href="#preview">قلّب في أول درس مجاناً</a>
+        <a class="btn ghost" href="order.html">اطلب النسخة الورقية</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><b>4</b><span>مواد في الخطة</span></div>
+        <div class="stat"><b>100%</b><span>محتوى علمي مجاني</span></div>
+        <div class="stat"><b>0</b><span>حشو ولا سطور للتمليق</span></div>
+      </div>
+    </div>
+
+    <!-- الغلاف (SVG بنفس روح التصميم) -->
+    <div class="cover" aria-label="غلاف كتاب الحد الممتاز فيزياء">
+      <svg viewBox="0 0 400 540" xmlns="http://www.w3.org/2000/svg" role="img">
+        <rect width="400" height="540" fill="#0d0d10"/>
+        <g opacity=".13" stroke="#ffe135" fill="none" stroke-width="1.4" font-family="serif" font-style="italic">
+          <text x="20" y="60" fill="#ffe135" stroke="none" font-size="24">F = ma</text>
+          <text x="260" y="110" fill="#8b7bb4" stroke="none" font-size="22">E = mc²</text>
+          <text x="30" y="480" fill="#ffe135" stroke="none" font-size="22">v = u + at</text>
+          <text x="270" y="450" fill="#8b7bb4" stroke="none" font-size="20">Q = It</text>
+          <path d="M320 180 a26 26 0 1 1 -20 42"/><path d="M300 222 l-8 22 l24 -8"/>
+          <circle cx="60" cy="140" r="18"/><path d="M42 140 h36"/>
+          <path d="M340 300 l18 30 l-36 0 z"/>
+          <path d="M40 380 q14 -22 28 0 q14 22 28 0"/>
+        </g>
+        <rect x="120" y="18" width="160" height="52" rx="26" fill="#ffe135"/>
+        <text x="200" y="53" text-anchor="middle" font-size="28" font-weight="900" fill="#0d0d10" font-family="Cairo,sans-serif">2027</text>
+        <!-- إطار الصورة -->
+        <rect x="60" y="90" width="280" height="330" rx="60" fill="#ff8fb3"/>
+        <rect x="74" y="104" width="252" height="302" rx="48" fill="none" stroke="#0d0d10" stroke-width="3" opacity=".25"/>
+        <!-- شخصية البنت المحجبة (أيقونة مبسطة) -->
+        <g>
+          <ellipse cx="200" cy="330" rx="92" ry="70" fill="#17171c"/>
+          <path d="M200 120 a80 86 0 0 1 80 86 v70 a80 60 0 0 1 -160 0 v-70 a80 86 0 0 1 80 -86 z" fill="#f5f0e8"/>
+          <path d="M200 120 a80 86 0 0 1 80 86 v30 h-160 v-30 a80 86 0 0 1 80 -86 z" fill="#efe8dc"/>
+          <ellipse cx="200" cy="215" rx="56" ry="62" fill="#f2c9a4"/>
+          <path d="M150 205 q50 -34 100 0 q-6 -46 -50 -46 q-44 0 -50 46z" fill="#f5f0e8"/>
+          <circle cx="178" cy="220" r="7" fill="#17171c"/><circle cx="222" cy="220" r="7" fill="#17171c"/>
+          <circle cx="180.5" cy="217.5" r="2.2" fill="#fff"/><circle cx="224.5" cy="217.5" r="2.2" fill="#fff"/>
+          <path d="M186 252 q14 10 28 0" stroke="#b4523e" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <path d="M168 200 q10 -8 22 -3" stroke="#17171c" stroke-width="5" fill="none" stroke-linecap="round"/>
+          <path d="M232 200 q-10 -8 -22 -3" stroke="#17171c" stroke-width="5" fill="none" stroke-linecap="round"/>
+        </g>
+        <!-- شريط الفيزياء -->
+        <rect x="40" y="432" width="320" height="46" rx="12" fill="#ffe135"/>
+        <text x="200" y="464" text-anchor="middle" font-size="26" font-weight="900" fill="#0d0d10" font-family="Cairo,sans-serif">الفيزياء</text>
+        <rect x="86" y="488" width="228" height="30" rx="10" fill="#ffe135" opacity=".9"/>
+        <text x="200" y="509" text-anchor="middle" font-size="14" font-weight="800" fill="#0d0d10" font-family="Cairo,sans-serif">الجزء الأول — الصف الثاني الثانوي</text>
+      </svg>
+      <span class="cover-badge">الفيزياء — الجزء الأول</span>
+    </div>
+  </div>
+</section>
+
+<!-- ================= قصة من قلب المعاناة ================= -->
+<section id="story">
+  <div class="wrap">
+    <div class="sec-title">
+      <div class="kicker">حكايتنا</div>
+      <h2>من قلب <span class="hl">المعاناة</span> اتولد الكتاب</h2>
+    </div>
+    <div class="story">
+      <div class="bubble kareem">
+        <div class="who">كريم عمر</div>
+        "كل الكتب الخارجية قاعدين بنذاكر وما فيهاش، إحنا كنا قاعدين بنذاكر ومخنا قفل من الكتب التقليدية وزهقنا من اللغة العربية الفصيحة."
+      </div>
+      <div class="bubble abqa">
+        <div class="who">عبقرينو</div>
+        "صعب نلاقي كتاب تقليدي! والله لو نظمناها واحدة واحدة هتتعمل — ومن هنا جات الفكرة."
+      </div>
+      <div class="bubble kareem">
+        <div class="who">كريم عمر</div>
+        "ومن هنا عملنا "الحد الممتاز" في الكتاب ده، شيلنا الحشو اللي ملوش لازمة، وركزنا على المضمون الخالص ومن ناحية الراحة في المذاكرة."
+      </div>
+      <div class="bubble abqa">
+        <div class="who">عبقرينو</div>
+        "هتلاقي الشرح والقوانين منظمة أهم أسئلة لتوفير وقتك على التصميم المريح للعين اللي يفتح نفسك على المذاكرة."
+      </div>
+      <div class="bubble kareem">
+        <div class="who">كريم عمر</div>
+        "أهم حاجة طريقة الشرح: مش أسئلة من أي مكان، وأسئلة من كتاب المدرسة والتقييمات والامتحانات — زي ما حصلنا، ومن غير ما تتعقد إحنا معاك خطوة بخطوة طول الترم."
+      </div>
+      <div class="bubble abqa">
+        <div class="who">عبقرينو</div>
+        "دوس معانا، وأنت تلاحظ المادة كلها أمر مؤكد ومضمون بإذن الله!"
+      </div>
+      <p class="story-note">لو حاسس إنك <b>مش لوحدك في المعركة</b> — فده بالظبط اللي حاسينه كل يوم. الكتاب ده اتعمل عشانك.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= سر التصميم ================= -->
+<section id="secret">
+  <div class="wrap">
+    <div class="sec-title">
+      <div class="kicker">الميزة التنافسية</div>
+      <h2>سر التصميم <span class="hl">المشترك</span> — شباب وبنات</h2>
+    </div>
+    <div class="secret-grid">
+      <div class="secret-card boys">
+        <h3>👨‍💻 إيد الولاد</h3>
+        <p>تركيز على العملية والسرعة:</p>
+        <ul>
+          <li>أسئلة مرتبة حسب الأهمية والتكرار في الامتحانات</li>
+          <li>تلخيصات سريعة قبل كل تدريب</li>
+          <li>زيرو حشو — كل سطر ليه قيمة</li>
+        </ul>
+      </div>
+      <div class="secret-card girls">
+        <h3>👩‍🎨 إيد البنات</h3>
+        <p>تركيز على التناسق والبهجة:</p>
+        <ul>
+          <li>ألوان مريحة للعين وتنسيق يفتح النفس على المذاكرة</li>
+          <li>مساحات بيضاء وخط واضح ومنظم</li>
+          <li>تفاصيل دافئة تخلي الكتاب "كشكول" مش "كراسة امتحان"</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= المعاينة المجانية ================= -->
+<section id="preview">
+  <div class="wrap">
+    <div class="sec-title">
+      <div class="kicker">جرب بنفسك</div>
+      <h2>معاينة مجانية — <span class="hl">قلّب في الدرس الأول</span></h2>
+    </div>
+    <div class="preview-wrap">
+      <div>
+        <div class="book" id="book">
+          <!-- الصفحة 1 -->
+          <div class="book-page" style="z-index:4">
+            <div class="paper-lines"></div>
+            <h4>الدرس الأول: الكميات الفيزيائية</h4>
+            <p>أي حاجة نقدر نقيسها ونعدّها اسمها <b>كمية فيزيائية</b>. زي المسافة والكتلة والزمن.</p>
+            <div class="rule">الكمية الأساسية: مالهاش قانون بتتشتق منه، زي (الطول – الكتلة – الزمن).</div>
+            <div class="rule">الكمية المشتقة: ناتجة عن قسمة أو ضرب كميات أساسية، زي السرعة = المسافة ÷ الزمن.</div>
+            <span class="pg-num">ص 1</span>
+          </div>
+          <!-- الصفحة 2 -->
+          <div class="book-page" style="z-index:3">
+            <div class="paper-lines"></div>
+            <h4>وحدات القياس</h4>
+            <ul>
+              <li>الطول ← المتر (m)</li>
+              <li>الكتلة ← الكيلوجرام (kg)</li>
+              <li>الزمن ← الثانية (s)</li>
+            </ul>
+            <div class="trend"><b>كبسولة التريند 🍿:</b> فاكر لما صاحبك قالك "هوصلك في دقيقة" وجالك بعد ربع ساعة؟ هو مش كداب… هو بس بيقيس الزمن بوحدة تانية! عشان كده الفيزياء لازم نتفق على وحدات قياس واحدة.</div>
+            <span class="pg-num">ص 2</span>
+          </div>
+          <!-- الصفحة 3 -->
+          <div class="book-page" style="z-index:2">
+            <div class="paper-lines"></div>
+            <h4>تدريب سريع</h4>
+            <p><b>س١:</b> صنّف الكميات الآتية (أساسية / مشتقة):</p>
+            <ul>
+              <li>السرعة ✍️</li>
+              <li>درجة الحرارة ✍️</li>
+              <li>الشحنة الكهربية ✍️</li>
+            </ul>
+            <div class="trend"><b>الإجابة في آخر الكتاب 👀</b> — بس حاول الأول، ده اللي هيفرق معاك في اللجنة.</div>
+            <span class="pg-num">ص 3</span>
+          </div>
+          <!-- الصفحة 4 -->
+          <div class="book-page" style="z-index:1">
+            <div class="paper-lines"></div>
+            <h4>خلاصة الدرس في 3 سطور</h4>
+            <ul>
+              <li>الكمية = حاجة نقدر نقيسها.</li>
+              <li>أساسية (زي الكتلة) × مشتقة (زي السرعة).</li>
+              <li>النظام الدولي وحّد الوحدات عشان محدش يضحك علينا 😄</li>
+            </ul>
+            <div class="rule">امسح الـ QR في الكتاب ↔ اسمع الشرح على منصة 2027 ↔ حل امتحان إلكتروني ↔ اكسب Streak 🔥</div>
+            <span class="pg-num">ص 4</span>
+          </div>
+        </div>
+        <div class="book-controls">
+          <button class="btn small ghost" id="prevPage">الصفحة اللي فاتت</button>
+          <button class="btn small" id="nextPage">اقلب الصفحة</button>
+        </div>
+      </div>
+      <div class="preview-copy">
+        <div class="feat"><span class="dot"></span><p>شرح <b style="color:var(--yellow)">بالعامية</b> — كأن زميلك الشاطر بيشرحلك، مش موظف بيقرأ نشرة.</p></div>
+        <div class="feat"><span class="dot"></span><p>كبسولة تريند في كل فكرة — الربط النفسي بيخلي القانون يثبت في الدماغ وميتنسيش في اللجنة.</p></div>
+        <div class="feat"><span class="dot"></span><p>تدريبات متركزة من <b style="color:var(--yellow)">كتاب المدرسة وتقييمات الوزارة</b> — مش 500 سؤال مكررين على نفس الفكرة.</p></div>
+        <div class="feat"><span class="dot"></span><p>مربوط بمنصة 2027: شرح صوتي + امتحان إلكتروني + نقاط وStreak.</p></div>
+        <a class="btn" href="order.html" style="margin-top:14px">عجبك؟ اطلب النسخة الكاملة</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ليه الحد الممتاز ================= -->
+<section id="why">
+  <div class="wrap">
+    <div class="sec-title">
+      <div class="kicker">ليه أسيب الكتب الخارجية وأذاكر منه؟</div>
+      <h2>4 أسباب هتخليك <span class="hl">متندمش</span></h2>
+    </div>
+    <div class="why-grid">
+      <div class="why-card">
+        <div class="n">1</div>
+        <h3>نظام متكامل: كتاب + منصة</h3>
+        <p>الكتاب مش لوحده — امسح الـ QR هتلاقي نفسك جوه منصة 2027: شرح للفكرة، امتحان إلكتروني، ونقاط في الـ Streak بتاعك.</p>
+      </div>
+      <div class="why-card">
+        <div class="n">2</div>
+        <h3>كبسولة التريند</h3>
+        <p>بنربط القوانين الصعبة بإيفيهات وتريندات الشارع اللي بتضحك عليها دلوقتي — القانون يثبت في دماغك بالضحك مش بالحفظ.</p>
+      </div>
+      <div class="why-card">
+        <div class="n">3</div>
+        <h3>محتوى مفلتر بالفرازة</h3>
+        <p>الكتب التانية بتحشي 500 سؤال عشان تملى ورق. إحنا بنشيل الحشو ونديك الأسئلة المضمونة اللي بتيجي فعلاً — بنوفر وقتك المتفرهد.</p>
+      </div>
+      <div class="why-card">
+        <div class="n">4</div>
+        <h3>خصوصية البنات أولاً</h3>
+        <p>زرار تواصل وردي مخصص للبنات مع الطالبات المصممات — راحة وخصوصية كاملة في الطلب والاستفسار. حركة محدش بيعملها.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CTA ================= -->
+<div class="wrap">
+  <div class="final-cta">
+    <h2>المحتوى العلمي مجاني 100% ✨</h2>
+    <p>بينزل أجزاء على مدار الترم، وفي الآخر ملف PDF كامل على منصة 2027.<br>النسخة الورقية بسعر التكلفة الفعلية (ورق + حبر + توصيل).</p>
+    <a class="btn" href="order.html">اطلب نسختك الآن</a>
   </div>
 </div>
-
-<section id="how" class="wrap">
-  <div class="sec-title"><h2>إزاي <span>تطلب؟</span></h2></div>
-  <div class="grid g-3">
-    <div class="card"><div class="n">1</div><h3>اختار طلبك</h3><p style="color:var(--text-muted); margin-top:10px;">حدد المادة والكمية اللي محتاجها.</p></div>
-    <div class="card"><div class="n">2</div><h3>بياناتك وصورك</h3><p style="color:var(--text-muted); margin-top:10px;">اكتب اسمك وارفع أحلى صور ليك.</p></div>
-    <div class="card"><div class="n">3</div><h3>الاستلام والدفع</h3><p style="color:var(--text-muted); margin-top:10px;">هنشوف التصميم، توافق عليه، وتدفع كاش أو انستا باي.</p></div>
-  </div>
-</section>
-
-<section id="samples" class="wrap">
-  <div class="sec-title"><h2>من <span>أعمالنا</span></h2></div>
-  <div class="grid g-4" id="samplesGrid"></div>
-</section>
 
 <footer>
-  <p>تصميم وتطوير كريم عمر & مصطفى محمد (عبقرينو) — AKMTOA</p>
+  <div class="wrap foot">
+    <span>© 2027 الحد الممتاز — من طالب لطالب</span>
+    <span>فريق: كريم عمر • عبقرينو • المصممات</span>
+  </div>
 </footer>
 
-<div class="modal" id="modal" onclick="this.classList.remove('open')">
-  <img id="modalImg" src="" onclick="event.stopPropagation()">
-</div>
-
-<script>
-// إعدادات الخلفية المتحركة (النجوم)
-const canvas = document.getElementById('stars');
-const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-let stars = Array.from({length: 120}, () => ({
-  x: Math.random() * canvas.width, y: Math.random() * canvas.height, 
-  r: Math.random() * 1.5, dx: (Math.random() - 0.5) * 0.5
-}));
-function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = '#ffffff';
-  stars.forEach(s => {
-    ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); ctx.fill();
-    s.x += s.dx; if(s.x < 0) s.x = canvas.width; if(s.x > canvas.width) s.x = 0;
-  });
-  requestAnimationFrame(draw);
-}
-draw();
-
-// عرض الكشاكيل السابقة
-const grid = document.getElementById('samplesGrid');
-grid.innerHTML = Array.from({length:8}, (_,i) => 
- `<div class="sample" onclick="document.getElementById('modalImg').src='assets/samples/sample-${i+1}.jpg'; document.getElementById('modal').classList.add('open')">
-    <img loading="lazy" src="assets/samples/sample-${i+1}.jpg">
-  </div>`).join('');
-</script>
+<div class="toast" id="toast">تمام! ✨</div>
+<script src="main.js"></script>
 </body>
 </html>
+
