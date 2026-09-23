@@ -1,318 +1,95 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>اطلب كشكولك | الحد الممتاز</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<style>
-/* نفس المتغيرات والتصميم الأساسي */
-:root { --bg: #0b1120; --surface: rgba(30, 41, 59, 0.7); --border: rgba(255, 255, 255, 0.1); --primary: #38bdf8; --text: #f8fafc; --text-muted: #94a3b8; --accent: #f59e0b; }
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
-body { background: var(--bg); color: var(--text); overflow-x: hidden; }
-canvas#stars { position: fixed; inset: 0; z-index: -1; }
-.wrap { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+/* ============ الحد الممتاز — منصة 2027 ============ */
+document.addEventListener('DOMContentLoaded', () => {
 
-/* تصميم الفورم (الخطوات) */
-.wizard-container { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 40px; backdrop-filter: blur(15px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
-.step-header { display: flex; gap: 10px; margin-bottom: 30px; overflow-x: auto; padding-bottom: 10px; }
-.sh { flex: 1; min-width: 100px; text-align: center; padding: 12px; border-radius: 12px; background: rgba(0,0,0,0.2); color: var(--text-muted); font-weight: 700; border: 1px solid transparent; transition: .3s; }
-.sh.active { background: rgba(56, 189, 248, 0.15); color: var(--primary); border-color: var(--primary); }
-.sh.done { color: #fff; }
+  /* ---------- معاينة الكتاب: تقليب الصفحات ---------- */
+  const pages = Array.from(document.querySelectorAll('.book-page'));
+  let cur = 0; // الصفحة الحالية (0 = الأولى)
 
-.step-content { display: none; animation: fadeIn .4s; }
-.step-content.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-/* عناصر الإدخال */
-label { display: block; font-weight: 700; margin: 20px 0 10px; font-size: 16px; }
-input, select, textarea { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff; padding: 15px; border-radius: 12px; font-size: 16px; outline: none; transition: .3s; }
-input:focus, select:focus, textarea:focus { border-color: var(--primary); background: rgba(0,0,0,0.5); }
-
-/* جريد المواد والكمية */
-.grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
-.card-sel { background: rgba(0,0,0,0.2); border: 2px solid var(--border); border-radius: 16px; padding: 10px; text-align: center; cursor: pointer; transition: .3s; }
-.card-sel img { width: 100%; height: 120px; object-fit: cover; border-radius: 10px; margin-bottom: 10px; }
-.card-sel:hover { border-color: rgba(255,255,255,0.3); }
-.card-sel.sel { border-color: var(--primary); background: rgba(56, 189, 248, 0.1); box-shadow: 0 0 15px rgba(56, 189, 248, 0.2); }
-
-/* الأزرار */
-.nav-btns { display: flex; justify-content: space-between; margin-top: 40px; border-top: 1px solid var(--border); padding-top: 20px; }
-.btn { background: var(--primary); color: #000; font-weight: 900; padding: 14px 30px; border-radius: 12px; border: none; cursor: pointer; font-size: 16px; transition: .3s; }
-.btn:hover { background: #0284c7; color: #fff; }
-.btn-back { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
-.btn-back:hover { background: rgba(255,255,255,0.1); color: #fff; }
-
-.photos-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-.photo-box { aspect-ratio: 3/4; border: 2px dashed var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); cursor: pointer; position: relative; overflow: hidden; }
-.photo-box img { width: 100%; height: 100%; object-fit: cover; }
-.photo-box .x { position: absolute; top: 5px; left: 5px; background: rgba(255,0,0,0.8); color: white; border: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; }
-
-/* توست و إشعارات */
-.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: #fff; color: #000; padding: 12px 25px; border-radius: 10px; font-weight: bold; transition: .4s; z-index: 1000; }
-.toast.show { transform: translateX(-50%) translateY(0); }
-header { padding: 15px 20px; background: rgba(11, 17, 32, 0.8); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-header a { color: var(--text); text-decoration: none; font-weight: 700; font-size: 14px; }
-</style>
-</head>
-<body>
-<canvas id="stars"></canvas>
-<header>
-  <img src="assets/logo-transparent.png" height="40" alt="">
-  <div>
-    <a href="index.html" style="margin-left: 15px;">الرئيسية</a>
-    <a href="track.html">تتبع طلبي</a>
-  </div>
-</header>
-
-<div class="wrap">
-  <div class="wizard-container">
-    <div class="step-header">
-      <div class="sh active" data-s="1">1. المادة</div>
-      <div class="sh" data-s="2">2. الكمية</div>
-      <div class="sh" data-s="3">3. البيانات</div>
-      <div class="sh" data-s="4">4. الصور</div>
-      <div class="sh" data-s="5">5. التأكيد</div>
-    </div>
-
-    <!-- خطوة 1: المادة -->
-    <div class="step-content active" data-step="1">
-      <h2 style="margin-bottom: 20px;">اختار المادة اللي محتاجها</h2>
-      <div class="grid-cards" id="subjGrid"></div>
-      <div id="lang2box" style="display: none;">
-        <label>اللغة الثانية:</label>
-        <select id="lang2sel"><option>فرنساوي</option><option>إيطالي</option><option>ألماني</option></select>
-      </div>
-    </div>
-
-    <!-- خطوة 2: الكمية -->
-    <div class="step-content" data-step="2">
-      <h2 style="margin-bottom: 20px;">محتاج كم كشكول؟</h2>
-      <div class="grid-cards" style="grid-template-columns: repeat(3, 1fr);" id="qtyGrid">
-        <div class="card-sel sel" data-qty="1"><h1 style="font-size:35px; color:var(--primary)">1</h1><p>كشكول</p><b id="p1">100 ج</b></div>
-        <div class="card-sel" data-qty="2"><h1 style="font-size:35px; color:var(--primary)">2</h1><p>كشكول</p><b id="p2">200 ج</b></div>
-        <div class="card-sel" data-qty="4" style="border-color: var(--accent);"><h1 style="font-size:35px; color:var(--accent)">4</h1><p>كشاكيل (باقة)</p><b id="p4" style="color:var(--accent)">350 ج</b></div>
-      </div>
-      <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid var(--accent); color: var(--accent); padding: 15px; border-radius: 12px; margin-top: 20px; text-align: center; font-weight: bold;">
-        🎁 عرض: باقة الـ 4 كشاكيل بتوفرلك فلوس!
-      </div>
-    </div>
-
-    <!-- خطوة 3: البيانات -->
-    <div class="step-content" data-step="3">
-      <h2>بياناتك للطباعة والتواصل</h2>
-      <label>اسمك بالعربي (للطباعة)</label><input id="nAr" placeholder="مثال: كريم عمر">
-      <label>اسمك بالإنجليزي (للطباعة)</label><input id="nEn" dir="ltr" placeholder="Kareem Omar">
-      <label>رقم الواتساب (للتواصل)</label><input id="ph" dir="ltr" type="tel" placeholder="01xxxxxxxxx">
-      <label>ملاحظات (اختياري)</label><textarea id="notes" rows="2" placeholder="ألوان بتحبها، تعديل معين..."></textarea>
-    </div>
-
-    <!-- خطوة 4: الصور -->
-    <div class="step-content" data-step="4">
-      <h2>ارفع صورك (من 3 لـ 4 صور)</h2>
-      <p style="color:var(--text-muted); font-size:14px; margin-bottom:15px;">اختار صور واضحة عشان التصميم يطلع بأعلى جودة.</p>
-      <div class="photos-grid" id="photosBox"></div>
-    </div>
-
-    <!-- خطوة 5: التأكيد -->
-    <div class="step-content" data-step="5">
-      <h2>راجع طلبك النهائي</h2>
-      <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 15px; padding: 25px; margin-top: 20px; line-height: 2.2; font-size: 16px;">
-        <div id="reviewDetails"></div>
-        <hr style="border-color:var(--border); margin:15px 0;">
-        <div style="display:flex; justify-content:space-between; font-size: 20px; font-weight: 900;">
-          <span>الإجمالي المطلوب:</span>
-          <span id="reviewTotal" style="color:var(--primary)">0 ج.م</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="nav-btns">
-      <button class="btn btn-back" id="btnPrev" style="visibility: hidden;">رجوع</button>
-      <button class="btn" id="btnNext">التالي</button>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<script>
-// إعدادات الخلفية (النجوم)
-const canvas = document.getElementById('stars');
-const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-let stars = Array.from({length: 100}, () => ({x: Math.random()*canvas.width, y: Math.random()*canvas.height, r: Math.random()*1.5, dx: (Math.random()-0.5)*0.5}));
-function draw() {
-  ctx.clearRect(0,0,canvas.width,canvas.height); ctx.fillStyle = '#fff';
-  stars.forEach(s => { ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI*2); ctx.fill(); s.x += s.dx; if(s.x < 0) s.x = canvas.width; if(s.x > canvas.width) s.x = 0; });
-  requestAnimationFrame(draw);
-} draw();
-
-// Firebase Config
-const firebaseConfig = {
-  apiKey: "AIzaSyCSgvi4tyeoQKSw-o8SZ_oFms0zfjgR6kU", authDomain: "alhady.firebaseapp.com",
-  databaseURL: "https://alhady-default-rtdb.firebaseio.com", projectId: "alhady",
-  storageBucket: "alhady.firebasestorage.app", messagingSenderId: "839424225673",
-  appId: "1:839424225673:web:4b68a4ad74e5a2526bf158"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
-let SETTINGS = { priceSingle: 100, bundleQty: 4, bundlePrice: 350 };
-let SUBJECTS = [];
-let order = { subject: null, subjectName: '', qty: 1, photos: [] };
-
-const showToast = msg => { const t = document.getElementById('toast'); t.innerText = msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 3000); };
-
-// جلب الإعدادات والمواد
-db.ref('settings').once('value', s => { 
-  if(s.val()) { 
-    SETTINGS = {...SETTINGS, ...s.val()};
-    document.getElementById('p1').innerText = SETTINGS.priceSingle + ' ج';
-    document.getElementById('p2').innerText = (SETTINGS.priceSingle * 2) + ' ج';
-    document.getElementById('p4').innerText = SETTINGS.bundlePrice + ' ج';
-  } 
-});
-
-db.ref('covers').once('value', s => {
-  if(s.val()) {
-    SUBJECTS = Object.values(s.val()).filter(x => x.active !== false);
-    document.getElementById('subjGrid').innerHTML = SUBJECTS.map(s => 
-      `<div class="card-sel subj-card" data-k="${s.key}" data-n="${s.label}"><img src="${s.img}"><b>${s.label}</b></div>`
-    ).join('');
-    
-    document.querySelectorAll('.subj-card').forEach(el => {
-      el.onclick = () => {
-        document.querySelectorAll('.subj-card').forEach(x => x.classList.remove('sel'));
-        el.classList.add('sel');
-        order.subject = el.dataset.k;
-        order.subjectName = el.dataset.n;
-        document.getElementById('lang2box').style.display = (order.subject === 'lang2') ? 'block' : 'none';
-      }
-    });
-  }
-});
-
-document.querySelectorAll('#qtyGrid .card-sel').forEach(el => {
-  el.onclick = () => {
-    document.querySelectorAll('#qtyGrid .card-sel').forEach(x => x.classList.remove('sel'));
-    el.classList.add('sel');
-    order.qty = parseInt(el.dataset.qty);
-  }
-});
-
-// التنقل بين الخطوات
-let currentStep = 1;
-const btnNext = document.getElementById('btnNext');
-const btnPrev = document.getElementById('btnPrev');
-
-function calcPrice() {
-  const p = SETTINGS.priceSingle; const bQty = SETTINGS.bundleQty; const bPrice = SETTINGS.bundlePrice;
-  if (order.qty >= bQty) {
-    const bundles = Math.floor(order.qty / bQty);
-    const remainder = order.qty % bQty;
-    return (bundles * bPrice) + (remainder * p);
-  }
-  return order.qty * p;
-}
-
-btnNext.onclick = () => {
-  if(currentStep === 1 && !order.subject) return showToast('⚠️ يرجى اختيار المادة أولاً');
-  if(currentStep === 3) {
-    if(!document.getElementById('nAr').value) return showToast('⚠️ يرجى كتابة الاسم بالعربي');
-    if(!document.getElementById('nEn').value) return showToast('⚠️ يرجى كتابة الاسم بالإنجليزي');
-    if(document.getElementById('ph').value.length < 11) return showToast('⚠️ تأكد من رقم الواتساب');
-  }
-  if(currentStep === 4 && order.photos.length < 3) return showToast('⚠️ يرجى رفع 3 صور على الأقل');
-
-  if(currentStep === 4) { // تحديث المراجعة
-    let subNameFinal = order.subjectName;
-    if(order.subject === 'lang2') subNameFinal += ' - ' + document.getElementById('lang2sel').value;
-    document.getElementById('reviewDetails').innerHTML = `
-      <b>المادة:</b> ${subNameFinal}<br>
-      <b>الكمية:</b> ${order.qty} كشكول<br>
-      <b>الاسم:</b> ${document.getElementById('nAr').value} | <span dir="ltr">${document.getElementById('nEn').value}</span><br>
-      <b>رقم التواصل:</b> <span dir="ltr">${document.getElementById('ph').value}</span>
-    `;
-    document.getElementById('reviewTotal').innerText = calcPrice() + ' ج.م';
-  }
-
-  if(currentStep === 5) return submitOrder();
-
-  currentStep++; updateUI();
-};
-
-btnPrev.onclick = () => { currentStep--; updateUI(); };
-
-function updateUI() {
-  document.querySelectorAll('.step-content').forEach(e => e.classList.remove('active'));
-  document.querySelector(`.step-content[data-step="${currentStep}"]`).classList.add('active');
-  
-  document.querySelectorAll('.sh').forEach(e => {
-    let s = parseInt(e.dataset.s);
-    e.className = 'sh' + (s === currentStep ? ' active' : (s < currentStep ? ' done' : ''));
-  });
-
-  btnPrev.style.visibility = currentStep === 1 ? 'hidden' : 'visible';
-  btnNext.innerText = currentStep === 5 ? '✅ تأكيد الطلب' : 'التالي';
-}
-
-// نظام رفع الصور المُبسط
-function renderPhotos() {
-  const box = document.getElementById('photosBox'); box.innerHTML = '';
-  order.photos.forEach((p, i) => {
-    box.innerHTML += `<div class="photo-box"><img src="${p}"><button class="x" onclick="order.photos.splice(${i},1); renderPhotos()">✕</button></div>`;
-  });
-  if(order.photos.length < 4) {
-    let inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'image/*'; inp.style.display = 'none';
-    inp.onchange = e => {
-      let r = new FileReader();
-      r.onload = ev => {
-        let img = new Image(); img.onload = () => {
-          let c = document.createElement('canvas'); let ctx = c.getContext('2d');
-          let scale = Math.min(1, 800 / Math.max(img.width, img.height));
-          c.width = img.width * scale; c.height = img.height * scale;
-          ctx.drawImage(img, 0, 0, c.width, c.height);
-          order.photos.push(c.toDataURL('image/jpeg', 0.7)); renderPhotos();
-        }; img.src = ev.target.result;
-      };
-      if(e.target.files[0]) r.readAsDataURL(e.target.files[0]);
-    };
-    let addBtn = document.createElement('div'); addBtn.className = 'photo-box'; addBtn.innerHTML = '<span style="font-size:30px; color:var(--text-muted)">+</span>';
-    addBtn.onclick = () => inp.click();
-    box.appendChild(addBtn);
-  }
-} renderPhotos();
-
-// إرسال الطلب (إصلاح الأخطاء)
-let isSubmitting = false;
-function submitOrder() {
-  if(isSubmitting) return; isSubmitting = true;
-  btnNext.innerText = '⏳ جاري الإرسال...'; btnNext.disabled = true;
-
-  let subNameFinal = order.subjectName;
-  if(order.subject === 'lang2') subNameFinal += ' - ' + document.getElementById('lang2sel').value;
-
-  const data = {
-    nameAr: document.getElementById('nAr').value, nameEn: document.getElementById('nEn').value,
-    phone: document.getElementById('ph').value, subject: order.subject, subjectLabel: subNameFinal,
-    qty: order.qty, total: calcPrice(), notes: document.getElementById('notes').value,
-    photos: order.photos, status: 'pending', createdAt: Date.now(), history: { pending: Date.now() }
+  const show = (msg) => {
+    const t = document.getElementById('toast');
+    if (!t) return;
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._h);
+    t._h = setTimeout(() => t.classList.remove('show'), 2200);
   };
 
-  db.ref('orders').push(data).then(ref => {
-    document.querySelector('.wizard-container').innerHTML = `
-      <div style="text-align:center; padding: 40px 0;">
-        <h1 style="color:var(--primary); font-size: 50px; margin-bottom: 20px;">✅</h1>
-        <h2>تم استلام طلبك بنجاح!</h2>
-        <p style="color:var(--text-muted); margin: 20px 0;">رقم الطلب الخاص بك هو:</p>
-        <div style="background:rgba(56,189,248,0.1); border:1px dashed var(--primary); padding:15px; border-radius:12px; font-size:24px; font-weight:bold; letter-spacing:2px; display:inline-block;">${ref.key}</div>
-        <p style="margin-top: 20px;"><a href="track.html?id=${ref.key}&ph=${data.phone}" class="btn">تتبع طلبك الآن 🔍</a></p>
-      </div>`;
-  }).catch(err => { showToast('❌ حدث خطأ في الاتصال'); isSubmitting = false; btnNext.disabled = false; btnNext.innerText = '✅ تأكيد الطلب'; });
-}
-</script>
-</body>
-</html>
+  const renderBook = () => {
+    pages.forEach((p, i) => {
+      // الصفحات اللي فاتت تترمي ورا
+      p.classList.toggle('flipped', i < cur);
+      p.style.zIndex = (i < cur) ? 0 : (pages.length - i);
+    });
+  };
+
+  const next = document.getElementById('nextPage');
+  const prev = document.getElementById('prevPage');
+  if (next && prev && pages.length) {
+    next.addEventListener('click', () => {
+      if (cur < pages.length - 1) { cur++; renderBook(); }
+      else show('ده كان عرض مجاني — الكتاب الكامل على منصة 2027 📚');
+    });
+    prev.addEventListener('click', () => {
+      if (cur > 0) { cur--; renderBook(); }
+    });
+    // قلب بالسحب/السكرول؟ نكتفي بالأزرار عشان الخفة
+  }
+
+  /* ---------- صفحة الطلب ---------- */
+  // تفعيل ستايل المواد المختارة
+  document.querySelectorAll('.subj input').forEach(cb => {
+    const paint = () => cb.closest('.subj').classList.toggle('on', cb.checked);
+    cb.addEventListener('change', paint); paint();
+  });
+
+  // حساب تقديري لسعر التكلفة
+  const COST_PER_SUBJECT = 55;   // تقدير للورق+الطباعة لكل مادة
+  const DELIVERY_BASE = 45;      // تقدير أساسي للتوصيل
+  const subjectsBox = document.getElementById('subjects');
+  const priceVal = document.getElementById('priceVal');
+  const updatePrice = () => {
+    if (!subjectsBox || !priceVal) return;
+    const n = subjectsBox.querySelectorAll('input:checked').length;
+    if (n === 0) { priceVal.textContent = '—'; return; }
+    const total = n * COST_PER_SUBJECT + DELIVERY_BASE;
+    priceVal.textContent = `≈ ${total} جنيه (${n} ${n > 1 ? 'مواد' : 'مادة'} + توصيل)`;
+  };
+  if (subjectsBox) {
+    subjectsBox.addEventListener('change', updatePrice);
+  }
+
+  // أرقام الواتساب — عدّل الرقمين من هنا بس
+  const WA_BOYS  = '201101258549';
+  const WA_GIRLS = '201101258549'; // TODO: ضع رقم الطالبات المصممات
+
+  const buildMsg = (who) => {
+    const name = (document.getElementById('name')?.value || '').trim();
+    const gov  = (document.getElementById('gov')?.value || '').trim();
+    const subs = Array.from(document.querySelectorAll('#subjects input:checked')).map(c => c.value);
+    let m = `السلام عليكم 👋 أنا ${who === 'girls' ? 'طالبة' : 'طالب'} وعايز أطلب كتاب الحد الممتاز 📚`;
+    if (name) m += `\nالاسم: ${name}`;
+    if (gov)  m += `\nالمحافظة: ${gov}`;
+    if (subs.length) m += `\nالمواد: ${subs.join('، ')}`;
+    if (priceVal && priceVal.textContent !== '—') m += `\nالتكلفة التقديرية: ${priceVal.textContent}`;
+    const notes = (document.getElementById('notes')?.value || '').trim();
+    if (notes) m += `\nملاحظات: ${notes}`;
+    return encodeURIComponent(m);
+  };
+
+  const openWA = (num, who) => {
+    window.open(`https://wa.me/${num}?text=${buildMsg(who)}`, '_blank');
+  };
+  document.getElementById('waBoys')?.addEventListener('click', () => openWA(WA_BOYS, 'boys'));
+  document.getElementById('waGirls')?.addEventListener('click', () => openWA(WA_GIRLS, 'girls'));
+
+  // إرسال الاستمارة → يفتح واتساب برسالة جاهزة
+  document.getElementById('orderForm')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const phone = (document.getElementById('phone')?.value || '').replace(/\D/g, '');
+    if (phone.length < 10) { show('اتأكد من رقم التليفون الأول 🙏'); return; }
+    const subs = document.querySelectorAll('#subjects input:checked').length;
+    if (subs === 0) { show('اختار مادة واحدة على الأقل 📚'); return; }
+    show('تمام! بيتم تحويلك لواتساب لتأكيد طلبك 🚀');
+    setTimeout(() => openWA(WA_BOYS, 'boys'), 800);
+  });
+});
