@@ -1,95 +1,145 @@
-/* ============ الحد الممتاز — منصة 2027 ============ */
-document.addEventListener('DOMContentLoaded', () => {
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>اطلب نسختك — الحد الممتاز | منصة 2027</title>
+<meta name="description" content="اطلب نسختك الورقية من سلسلة كتب الحد الممتاز بسعر التكلفة الفعلي، أو كلمنا واتساب.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="doodle-bg"></div>
 
-  /* ---------- معاينة الكتاب: تقليب الصفحات ---------- */
-  const pages = Array.from(document.querySelectorAll('.book-page'));
-  let cur = 0; // الصفحة الحالية (0 = الأولى)
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="index.html">
+      <span class="logo-badge">الحد الممتاز</span>
+      <span class="logo-sub">منصة 2027</span>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html#story">حكايتنا</a>
+      <a href="index.html#preview">معاينة مجانية</a>
+      <a href="index.html#why">ليه نحن؟</a>
+    </nav>
+    <a class="btn small" href="index.html" style="margin-inline-start:auto">رجوع للرئيسية</a>
+  </div>
+</header>
 
-  const show = (msg) => {
-    const t = document.getElementById('toast');
-    if (!t) return;
-    t.textContent = msg;
-    t.classList.add('show');
-    clearTimeout(t._h);
-    t._h = setTimeout(() => t.classList.remove('show'), 2200);
-  };
+<section class="order-hero">
+  <div class="wrap">
+    <h1>اطلب نسختك من <span class="hl">الحد الممتاز</span> 📚</h1>
+    <p>النسخة الورقية بسعر التكلفة الفعلي فقط — عشان الكل يذاكر. والمحتوى العلمي مجاني على المنصة.</p>
+  </div>
+</section>
 
-  const renderBook = () => {
-    pages.forEach((p, i) => {
-      // الصفحات اللي فاتت تترمي ورا
-      p.classList.toggle('flipped', i < cur);
-      p.style.zIndex = (i < cur) ? 0 : (pages.length - i);
-    });
-  };
+<div class="wrap order-grid">
 
-  const next = document.getElementById('nextPage');
-  const prev = document.getElementById('prevPage');
-  if (next && prev && pages.length) {
-    next.addEventListener('click', () => {
-      if (cur < pages.length - 1) { cur++; renderBook(); }
-      else show('ده كان عرض مجاني — الكتاب الكامل على منصة 2027 📚');
-    });
-    prev.addEventListener('click', () => {
-      if (cur > 0) { cur--; renderBook(); }
-    });
-    // قلب بالسحب/السكرول؟ نكتفي بالأزرار عشان الخفة
-  }
+  <!-- ======= استمارة الطلب ======= -->
+  <div class="panel">
+    <h2>استمارة الشحن والتوصيل</h2>
+    <form id="orderForm">
+      <div class="field">
+        <label for="name">الاسم بالكامل</label>
+        <input type="text" id="name" placeholder="مثال: كريم عمر" required>
+      </div>
+      <div class="field">
+        <label for="gov">المحافظة</label>
+        <select id="gov" required>
+          <option value="">اختر محافظتك...</option>
+          <option>القاهرة</option><option>الجيزة</option><option>الإسكندرية</option>
+          <option>الدقهلية</option><option>الشرقية</option><option>الغربية</option>
+          <option>المنوفية</option><option>البحيرة</option><option>كفر الشيخ</option>
+          <option>دمياط</option><option>بورسعيد</option><option>الإسماعيلية</option>
+          <option>السويس</option><option>الفيوم</option><option>بني سويف</option>
+          <option>المنيا</option><option>أسيوط</option><option>سوهاج</option>
+          <option>قنا</option><option>الأقصر</option><option>أسوان</option>
+          <option>البحر الأحمر</option><option>مطروح</option><option>شمال سيناء</option>
+          <option>جنوب سيناء</option><option>الوادي الجديد</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="phone">رقم الهاتف (واتساب)</label>
+        <input type="tel" id="phone" inputmode="tel" placeholder="01xxxxxxxxx" required>
+        <div class="hint">هنتواصل معاك على الرقم ده لتأكيد الطلب.</div>
+      </div>
+      <div class="field">
+        <label>المواد المطلوبة</label>
+        <div class="subjects" id="subjects">
+          <label class="subj"><input type="checkbox" value="الفيزياء"> الفيزياء ⚡</label>
+          <label class="subj"><input type="checkbox" value="العربي"> العربي 📖</label>
+          <label class="subj"><input type="checkbox" value="الإنجليزي"> الإنجليزي 🔤</label>
+          <label class="subj"><input type="checkbox" value="التاريخ"> التاريخ 🏛️</label>
+        </div>
+      </div>
+      <div class="field">
+        <label for="notes">ملاحظات (اختياري)</label>
+        <textarea id="notes" rows="3" placeholder="أي تفاصيل إضافية..."></textarea>
+      </div>
+      <div class="price-box" id="priceBox">
+        اختر المواد عشان تشوف التكلفة التقديرية.<br>
+        <b id="priceVal">—</b>
+        <small>سعر التكلفة الفعلي: ثمن الورق + الحبر + التوصيل — بنحسبهولك بالظبط في التأكيد.</small>
+      </div>
+      <button class="btn" type="submit" style="width:100%;justify-content:center">تأكيد الطلب 🚀</button>
+    </form>
+  </div>
 
-  /* ---------- صفحة الطلب ---------- */
-  // تفعيل ستايل المواد المختارة
-  document.querySelectorAll('.subj input').forEach(cb => {
-    const paint = () => cb.closest('.subj').classList.toggle('on', cb.checked);
-    cb.addEventListener('change', paint); paint();
-  });
+  <!-- ======= التواصل الذكي ======= -->
+  <div>
+    <div class="panel" style="margin-bottom:24px">
+      <h2>كلمنا مباشرة على واتساب</h2>
+      <div class="wa-group">
+        <button class="wa-btn boys" id="waBoys" type="button">
+          <span class="ico">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.6-6.1c-.3-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.3-.6.8-.8 1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4 0-.5.2-.7l.5-.6c.1-.2.1-.4 0-.5l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.9.9-1.2 2.1-.4 3.6a11.6 11.6 0 0 0 4.5 4.2c1.7.8 2.4.9 3.2.7.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2l-.2-.1z"/></svg>
+          </span>
+          <span>تواصل مع الفريق (شباب)<small>كريم / عبقرينو — رد سريع على استفساراتك</small></span>
+        </button>
+        <button class="wa-btn girls" id="waGirls" type="button">
+          <span class="ico">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.6-6.1c-.3-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.3-.6.8-.8 1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4 0-.5.2-.7l.5-.6c.1-.2.1-.4 0-.5l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.9.9-1.2 2.1-.4 3.6a11.6 11.6 0 0 0 4.5 4.2c1.7.8 2.4.9 3.2.7.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2l-.2-.1z"/></svg>
+          </span>
+          <span>تواصل مع الطالبات المصممات<small>خصوصية كاملة وراحة في التعامل والاستفسار</small></span>
+        </button>
+      </div>
+      <div class="privacy-note">
+        <b>ليه زرار خاص للبنات؟</b> عشان الطالبات وأولياء الأمور يتعاملوا براحة تامة مع بنات زيهم — حركة شهمة وذكية محدش بيعملها، وهتخلي براند "الحد الممتاز" موضع ثقة.
+      </div>
+    </div>
 
-  // حساب تقديري لسعر التكلفة
-  const COST_PER_SUBJECT = 55;   // تقدير للورق+الطباعة لكل مادة
-  const DELIVERY_BASE = 45;      // تقدير أساسي للتوصيل
-  const subjectsBox = document.getElementById('subjects');
-  const priceVal = document.getElementById('priceVal');
-  const updatePrice = () => {
-    if (!subjectsBox || !priceVal) return;
-    const n = subjectsBox.querySelectorAll('input:checked').length;
-    if (n === 0) { priceVal.textContent = '—'; return; }
-    const total = n * COST_PER_SUBJECT + DELIVERY_BASE;
-    priceVal.textContent = `≈ ${total} جنيه (${n} ${n > 1 ? 'مواد' : 'مادة'} + توصيل)`;
-  };
-  if (subjectsBox) {
-    subjectsBox.addEventListener('change', updatePrice);
-  }
+    <div class="panel faq">
+      <h2>أسئلة بتتكرر</h2>
+      <details>
+        <summary>الكتاب بكام؟</summary>
+        <p>المحتوى العلمي مجاني 100% على المنصة. النسخة الورقية بـ<b>سعر التكلفة الفعلي</b> (ورق + حبر + توصيل) — بنقولك المبلغ بالظبط قبل التأكيد.</p>
+      </details>
+      <details>
+        <summary>إمتى بيخلص الكتاب؟</summary>
+        <p>الكتاب بيتبني مع المنهج: كل درس بينزل جزءه على مدار الترم، وفي آخر الترم بينزل ملف PDF كامل ومؤمّن على منصة 2027.</p>
+      </details>
+      <details>
+        <summary>الأسئلة منين؟</summary>
+        <p>من كتاب المدرسة وتقييمات الوزارة والامتحانات الرسمية (ملك عام)، مع تطوير أفكار المسائل الخارجية بالذكاء الاصطناعي لضمان التفرد.</p>
+      </details>
+      <details>
+        <summary>التوصيل بيوصل فين؟</summary>
+        <p>كل المحافظات — بنرتب معاك موعد وعنوان مناسبين عبر واتساب بعد تأكيد الطلب.</p>
+      </details>
+    </div>
+  </div>
+</div>
 
-  // أرقام الواتساب — عدّل الرقمين من هنا بس
-  const WA_BOYS  = '201101258549';
-  const WA_GIRLS = '201101258549'; // TODO: ضع رقم الطالبات المصممات
+<footer>
+  <div class="wrap foot">
+    <span>© 2027 الحد الممتاز — من طالب لطالب</span>
+    <span>المحتوى العلمي مجاني 100%</span>
+  </div>
+</footer>
 
-  const buildMsg = (who) => {
-    const name = (document.getElementById('name')?.value || '').trim();
-    const gov  = (document.getElementById('gov')?.value || '').trim();
-    const subs = Array.from(document.querySelectorAll('#subjects input:checked')).map(c => c.value);
-    let m = `السلام عليكم 👋 أنا ${who === 'girls' ? 'طالبة' : 'طالب'} وعايز أطلب كتاب الحد الممتاز 📚`;
-    if (name) m += `\nالاسم: ${name}`;
-    if (gov)  m += `\nالمحافظة: ${gov}`;
-    if (subs.length) m += `\nالمواد: ${subs.join('، ')}`;
-    if (priceVal && priceVal.textContent !== '—') m += `\nالتكلفة التقديرية: ${priceVal.textContent}`;
-    const notes = (document.getElementById('notes')?.value || '').trim();
-    if (notes) m += `\nملاحظات: ${notes}`;
-    return encodeURIComponent(m);
-  };
-
-  const openWA = (num, who) => {
-    window.open(`https://wa.me/${num}?text=${buildMsg(who)}`, '_blank');
-  };
-  document.getElementById('waBoys')?.addEventListener('click', () => openWA(WA_BOYS, 'boys'));
-  document.getElementById('waGirls')?.addEventListener('click', () => openWA(WA_GIRLS, 'girls'));
-
-  // إرسال الاستمارة → يفتح واتساب برسالة جاهزة
-  document.getElementById('orderForm')?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const phone = (document.getElementById('phone')?.value || '').replace(/\D/g, '');
-    if (phone.length < 10) { show('اتأكد من رقم التليفون الأول 🙏'); return; }
-    const subs = document.querySelectorAll('#subjects input:checked').length;
-    if (subs === 0) { show('اختار مادة واحدة على الأقل 📚'); return; }
-    show('تمام! بيتم تحويلك لواتساب لتأكيد طلبك 🚀');
-    setTimeout(() => openWA(WA_BOYS, 'boys'), 800);
-  });
-});
+<div class="toast" id="toast">تمام! ✨</div>
+<script src="main.js"></script>
+</body>
+</html>
